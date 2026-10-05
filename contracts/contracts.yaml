@@ -1,0 +1,82 @@
+version: 1
+# MAW-KG 契约清单 v1 —— 首批契约：全部来自试点实测锚定的真实跨端接口
+# 规则：符号一律精确限定；path_variant 是消费端实际请求路径（归一化前）
+contracts:
+  - id: mobile-app-registration
+    kind: http
+    description: mobile_app 设备注册接口（POST /api/mobile_app/registrations）
+    provider:
+      repo: ha-core
+      symbol: RegistrationsView.post
+      file: homeassistant/components/mobile_app/http_api.py
+      line: 67
+      path_variant: /api/mobile_app/registrations
+    consumers:
+      - repo: ha-android
+        symbol: IntegrationRepositoryImpl.registerDevice
+        file: common/src/main/kotlin/io/homeassistant/companion/android/common/data/integration/impl/IntegrationRepositoryImpl.kt
+        line: 121
+        path_variant: /api/mobile_app/registrations
+      - repo: ha-ios
+        symbol: HAAPI.register
+        file: Sources/Shared/API/HAAPI.swift
+        line: 564
+        path_variant: /mobile_app/registrations   # HAAPI 无 /api 前缀——PATH-NORM 归一化用例
+    checks:
+      - path_match: normalized
+      - symbol_exists: true
+    meta:
+      owner: Z哥
+      created: 2026-10-06
+      source: 试点根因链 anchor（endpoint-extraction-rootcause.md）
+
+  - id: mobile-app-watch-registration
+    kind: http
+    description: Watch 独立设备注册（同一后端端点的第二消费者，数组路径形态）
+    provider:
+      repo: ha-core
+      symbol: RegistrationsView.post
+      file: homeassistant/components/mobile_app/http_api.py
+      line: 67
+      path_variant: /api/mobile_app/registrations
+    consumers:
+      - repo: ha-ios
+        symbol: WatchDeviceRegistrar.sendRegistration
+        file: Sources/Shared/Watch/DeviceRegistration/WatchDeviceRegistrar.swift
+        line: 96
+        path_variant: /api/mobile_app/registrations   # HomeAssistantRESTClient 带 /api 前缀
+    checks:
+      - path_match: normalized
+      - symbol_exists: true
+    meta:
+      owner: Z哥
+      created: 2026-10-06
+      source: 根因链 SW-ARRAY-PATH 用例
+
+  - id: mobile-app-webhook-update
+    kind: http
+    description: 设备更新注册状态（webhook 回传，注册契约的姊妹端点）
+    provider:
+      repo: ha-core
+      symbol: webhook_update_registration
+      file: homeassistant/components/mobile_app/webhook.py
+      line: 435
+      path_variant: /api/web_hook/{webhook_id}
+    consumers:
+      - repo: ha-android
+        symbol: IntegrationRepositoryImpl.updateRegistration
+        file: common/src/main/kotlin/io/homeassistant/companion/android/common/data/integration/impl/IntegrationRepositoryImpl.kt
+        line: 162
+        path_variant: /api/web_hook/{webhook_id}
+      - repo: ha-ios
+        symbol: HAAPI.updateRegistration
+        file: Sources/Shared/API/HAAPI.swift
+        line: 590
+        path_variant: /api/web_hook/{webhook_id}
+    checks:
+      - path_match: normalized
+      - symbol_exists: true
+    meta:
+      owner: Z哥
+      created: 2026-10-06
+      source: 源码交叉核对（webhook.py:435 / IntegrationRepositoryImpl:162 / HAAPI:590）
