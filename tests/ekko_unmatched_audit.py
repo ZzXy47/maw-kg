@@ -25,7 +25,9 @@ routes = []
 for f in (ROOT / 'packages/server/src/modules').rglob('routes/*.ts'):
     routes += ts_koa_route(read(f), f.relative_to(ROOT).as_posix())
 calls = []
-for f in (ROOT / 'packages/client/src/api').rglob('*.ts'):
+client_files = [f for f in (ROOT / 'packages/client/src').rglob('*')
+                if f.is_file() and f.suffix in ('.ts', '.vue')]
+for f in client_files:
     calls += ts_request_template(read(f), f.relative_to(ROOT).as_posix())
 
 matched = set()

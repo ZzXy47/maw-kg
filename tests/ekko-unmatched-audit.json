@@ -1,9 +1,9 @@
 {
-  "unmatched": 133,
+  "unmatched": 112,
   "classification": {
-    "server": 54,
-    "client-string": 35,
-    "tests": 36,
+    "server": 51,
+    "client-string": 19,
+    "tests": 34,
     "bin": 8
   },
   "routes": [
@@ -46,11 +46,6 @@
       "method": "GET",
       "path": "/api/hermes/kanban/artifact",
       "bucket": "tests"
-    },
-    {
-      "method": "GET",
-      "path": "/api/hermes/kanban/search-sessions",
-      "bucket": "client-string"
     },
     {
       "method": "GET",
@@ -108,33 +103,8 @@
       "bucket": "client-string"
     },
     {
-      "method": "GET",
-      "path": "/api/hermes/bundles",
-      "bucket": "client-string"
-    },
-    {
-      "method": "POST",
-      "path": "/api/hermes/bundles",
-      "bucket": "client-string"
-    },
-    {
-      "method": "DELETE",
-      "path": "/api/hermes/bundles/:commandName",
-      "bucket": "client-string"
-    },
-    {
       "method": "POST",
       "path": "/api/hermes/skills/import",
-      "bucket": "client-string"
-    },
-    {
-      "method": "PUT",
-      "path": "/api/hermes/skills/:category/:skill",
-      "bucket": "client-string"
-    },
-    {
-      "method": "DELETE",
-      "path": "/api/hermes/skills/:category/:skill",
       "bucket": "client-string"
     },
     {
@@ -293,11 +263,6 @@
       "bucket": "client-string"
     },
     {
-      "method": "GET",
-      "path": "/api/studio/files/preview",
-      "bucket": "client-string"
-    },
-    {
       "method": "POST",
       "path": "/api/studio/files/upload",
       "bucket": "client-string"
@@ -328,11 +293,6 @@
       "bucket": "server"
     },
     {
-      "method": "GET",
-      "path": "/api/studio/group-chat/invites/:code/agent-links/:requestId",
-      "bucket": "server"
-    },
-    {
       "method": "POST",
       "path": "/api/studio/group-chat/remote-workspace/v1",
       "bucket": "tests"
@@ -346,16 +306,6 @@
       "method": "PUT",
       "path": "/api/studio/group-chat/remote-workspace/v1/file",
       "bucket": "tests"
-    },
-    {
-      "method": "GET",
-      "path": "/api/studio/group-chat/rooms/:roomId/agent-link-requests",
-      "bucket": "server"
-    },
-    {
-      "method": "POST",
-      "path": "/api/studio/group-chat/rooms/:roomId/agent-link-requests/:requestId/decision",
-      "bucket": "server"
     },
     {
       "method": "POST",
@@ -395,11 +345,6 @@
     {
       "method": "GET",
       "path": "/api/studio/group-chat/rooms/:roomId/workspace-files/list",
-      "bucket": "tests"
-    },
-    {
-      "method": "GET",
-      "path": "/api/studio/group-chat/rooms/:roomId/workspace-file/content",
       "bucket": "tests"
     },
     {
@@ -519,27 +464,12 @@
     },
     {
       "method": "GET",
-      "path": "/api/studio/usage/pricing",
-      "bucket": "client-string"
-    },
-    {
-      "method": "PUT",
-      "path": "/api/studio/usage/pricing",
-      "bucket": "client-string"
-    },
-    {
-      "method": "GET",
       "path": "/api/studio/sessions/:id/context",
       "bucket": "client-string"
     },
     {
       "method": "GET",
       "path": "/api/studio/sessions/:id/workspace-files/list",
-      "bucket": "tests"
-    },
-    {
-      "method": "GET",
-      "path": "/api/studio/sessions/:id/workspace-file/content",
       "bucket": "tests"
     },
     {
@@ -588,26 +518,6 @@
       "bucket": "server"
     },
     {
-      "method": "GET",
-      "path": "/api/studio/workspace/folders",
-      "bucket": "client-string"
-    },
-    {
-      "method": "POST",
-      "path": "/api/studio/workspace/folders",
-      "bucket": "client-string"
-    },
-    {
-      "method": "POST",
-      "path": "/api/studio/workspace/folders/rename",
-      "bucket": "client-string"
-    },
-    {
-      "method": "DELETE",
-      "path": "/api/studio/workspace/folders",
-      "bucket": "client-string"
-    },
-    {
       "method": "POST",
       "path": "/api/studio/voice/proxy/:profile/v1/audio/transcriptions",
       "bucket": "tests"
@@ -626,11 +536,6 @@
       "method": "POST",
       "path": "/api/studio/mcu/voice-turn",
       "bucket": "tests"
-    },
-    {
-      "method": "GET",
-      "path": "/api/theme/background",
-      "bucket": "client-string"
     },
     {
       "method": "POST",
@@ -660,16 +565,6 @@
     {
       "method": "POST",
       "path": "/api/studio/tts/synthesize",
-      "bucket": "client-string"
-    },
-    {
-      "method": "POST",
-      "path": "/api/studio/uploads",
-      "bucket": "client-string"
-    },
-    {
-      "method": "GET",
-      "path": "/api/studio/workflows",
       "bucket": "client-string"
     }
   ]

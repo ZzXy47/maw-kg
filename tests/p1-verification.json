@@ -15,7 +15,7 @@
     {
       "name": "2a maw_explore works",
       "pass": true,
-      "detail": "0.5s 8251ch"
+      "detail": "7.0s 8251ch"
     },
     {
       "name": "2b maw_query works",
@@ -50,7 +50,7 @@
     {
       "name": "6 env selfcheck flags 4MB clusters",
       "pass": true,
-      "detail": "{\n \"cluster_warnings\": [\n  \"repo ha-core on E:/: cluster 4096KB > 64KB — index dirs must NOT live on this volume (v3.1 §5.1)\",\n  \"repo ha-android on E"
+      "detail": "{\n \"cluster_warnings\": [\n  \"repo ha-core on E:/: cluster 4096KB > 64KB with WRITABLE index (wal/shm/daemon present) — index dir must NOT live on this "
     },
     {
       "name": "7 FP probe: no fabricated hits",

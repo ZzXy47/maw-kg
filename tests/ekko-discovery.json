@@ -4,7 +4,7 @@
   "route_files": 61,
   "providers": 525,
   "client_api_files": 425,
-  "consumers": 433,
+  "consumers": 446,
   "matches": [
     {
       "method": "GET",
@@ -1336,6 +1336,30 @@
     },
     {
       "method": "GET",
+      "path": "/api/hermes/bundles",
+      "provider_symbol": "ctrl.list",
+      "provider_file": "packages/server/src/modules/hermes/routes/skill-bundles.ts",
+      "consumer_file": "packages/client/src/api/hermes/skill-bundles.ts",
+      "consumer_line": 33
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/bundles",
+      "provider_symbol": "ctrl.create",
+      "provider_file": "packages/server/src/modules/hermes/routes/skill-bundles.ts",
+      "consumer_file": "packages/client/src/api/hermes/skill-bundles.ts",
+      "consumer_line": 38
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hermes/bundles/:commandName",
+      "provider_symbol": "ctrl.remove",
+      "provider_file": "packages/server/src/modules/hermes/routes/skill-bundles.ts",
+      "consumer_file": "packages/client/src/api/hermes/skill-bundles.ts",
+      "consumer_line": 46
+    },
+    {
+      "method": "GET",
       "path": "/api/hermes/skills",
       "provider_symbol": "ctrl.list",
       "provider_file": "packages/server/src/modules/hermes/routes/skills.ts",
@@ -1381,6 +1405,22 @@
       "provider_file": "packages/server/src/modules/hermes/routes/skills.ts",
       "consumer_file": "packages/client/src/api/hermes/skills.ts",
       "consumer_line": 174
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hermes/skills/:category/:skill",
+      "provider_symbol": "ctrl.updateSkill",
+      "provider_file": "packages/server/src/modules/hermes/routes/skills.ts",
+      "consumer_file": "packages/client/src/api/hermes/skills.ts",
+      "consumer_line": 143
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hermes/skills/:category/:skill",
+      "provider_symbol": "ctrl.deleteSkill",
+      "provider_file": "packages/server/src/modules/hermes/routes/skills.ts",
+      "consumer_file": "packages/client/src/api/hermes/skills.ts",
+      "consumer_line": 195
     },
     {
       "method": "GET",
@@ -1888,6 +1928,14 @@
     },
     {
       "method": "GET",
+      "path": "/api/studio/files/preview",
+      "provider_symbol": "previewCtrl.previewProfileFile",
+      "provider_file": "packages/server/src/modules/studio/routes/files.ts",
+      "consumer_file": "packages/client/src/api/studio/files.ts",
+      "consumer_line": 150
+    },
+    {
+      "method": "GET",
       "path": "/api/studio/files/list",
       "provider_symbol": "ctrl.list",
       "provider_file": "packages/server/src/modules/studio/routes/files.ts",
@@ -1968,6 +2016,14 @@
     },
     {
       "method": "GET",
+      "path": "/api/studio/group-chat/invites/:code/agent-links/:requestId",
+      "provider_symbol": "agentLinkCtrl.pairingStatus",
+      "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
+      "consumer_file": "packages/client/src/api/studio/group-chat-agent-link.ts",
+      "consumer_line": 158
+    },
+    {
+      "method": "GET",
       "path": "/api/studio/group-chat-link/v1/agents",
       "provider_symbol": "agentLinkCtrl.localAgents",
       "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
@@ -2029,6 +2085,22 @@
       "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
       "consumer_file": "packages/client/src/api/studio/group-chat-agent-link.ts",
       "consumer_line": 83
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms/:roomId/agent-link-requests",
+      "provider_symbol": "agentLinkCtrl.pendingPairings",
+      "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
+      "consumer_file": "packages/client/src/api/studio/group-chat-agent-link.ts",
+      "consumer_line": 165
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/group-chat/rooms/:roomId/agent-link-requests/:requestId/decision",
+      "provider_symbol": "agentLinkCtrl.decidePairing",
+      "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
+      "consumer_file": "packages/client/src/api/studio/group-chat-agent-link.ts",
+      "consumer_line": 173
     },
     {
       "method": "PUT",
@@ -2117,6 +2189,38 @@
       "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
       "consumer_file": "packages/client/src/api/studio/group-chat.ts",
       "consumer_line": 590
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms/:roomId/workspace-file/content",
+      "provider_symbol": "workspaceCtrl.readWorkspaceFileContent",
+      "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
+      "consumer_file": "packages/client/src/api/studio/group-chat.ts",
+      "consumer_line": 603
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms/:roomId/workspace-file/content",
+      "provider_symbol": "workspaceCtrl.readWorkspaceFileContent",
+      "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
+      "consumer_file": "packages/client/src/api/studio/group-chat.ts",
+      "consumer_line": 611
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms/:roomId/workspace-file/content",
+      "provider_symbol": "workspaceCtrl.readWorkspaceFileContent",
+      "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
+      "consumer_file": "packages/client/src/api/studio/group-chat.ts",
+      "consumer_line": 619
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms/:roomId/workspace-file/content",
+      "provider_symbol": "workspaceCtrl.readWorkspaceFileContent",
+      "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
+      "consumer_file": "packages/client/src/api/studio/group-chat.ts",
+      "consumer_line": 627
     },
     {
       "method": "PUT",
@@ -2671,6 +2775,38 @@
       "consumer_line": 242
     },
     {
+      "method": "GET",
+      "path": "/api/studio/sessions/:id/workspace-file/content",
+      "provider_symbol": "ctrl.readWorkspaceFileContent",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 263
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/:id/workspace-file/content",
+      "provider_symbol": "ctrl.readWorkspaceFileContent",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 275
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/:id/workspace-file/content",
+      "provider_symbol": "ctrl.readWorkspaceFileContent",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 286
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/:id/workspace-file/content",
+      "provider_symbol": "ctrl.readWorkspaceFileContent",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 298
+    },
+    {
       "method": "PUT",
       "path": "/api/studio/sessions/:id/workspace-file/write",
       "provider_symbol": "ctrl.writeWorkspaceFile",
@@ -3071,6 +3207,14 @@
       "consumer_line": 51
     },
     {
+      "method": "GET",
+      "path": "/api/theme/background",
+      "provider_symbol": "ctrl.getThemeBackground",
+      "provider_file": "packages/server/src/modules/studio/routes/theme.ts",
+      "consumer_file": "packages/client/src/api/studio/theme.ts",
+      "consumer_line": 77
+    },
+    {
       "method": "DELETE",
       "path": "/api/theme/background",
       "provider_symbol": "ctrl.deleteThemeBackground",
@@ -3197,6 +3341,14 @@
       "provider_file": "packages/server/src/modules/studio/routes/upload.ts",
       "consumer_file": "packages/client/src/stores/hermes/chat.ts",
       "consumer_line": 621
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/workflows",
+      "provider_symbol": "ctrl.list",
+      "provider_file": "packages/server/src/modules/studio/routes/workflows.ts",
+      "consumer_file": "packages/client/src/api/studio/workflows.ts",
+      "consumer_line": 177
     },
     {
       "method": "POST",

@@ -62,12 +62,31 @@ def cluster_size_bytes(vol: str) -> int:
     return 0
 
 def env_selfcheck() -> list:
+    """Cluster-size check with E:-drive nuance (v3.1 §5.1 refined 2026-10-06):
+    - An index dir with daemon/wal churn (write path) on >64KB clusters → hard
+      warning, index must move.
+    - A read-only single-file .codegraph/codegraph.db (query-only, no -wal/-shm,
+      no daemon) tolerates large clusters — file occupies cluster-size slack but
+      has no small-file churn — downgraded to informational note.
+    - Volume recommended for writable indexes: local NTFS 4KB (C:/D:)."""
     warns = []
     for name, root in REPO_ROOTS.items():
         vol = Path(root).drive + "/"
         cs = cluster_size_bytes(vol)
-        if cs > 65536:
-            warns.append(f"repo {name} on {vol}: cluster {cs//1024}KB > 64KB — index dirs must NOT live on this volume (v3.1 §5.1)")
+        if cs <= 65536:
+            continue
+        idx = Path(root) / ".codegraph"
+        writable_churn = False
+        if idx.exists():
+            names = {f.name for f in idx.iterdir()}
+            writable_churn = bool(names & {"codegraph.db-wal", "codegraph.db-shm",
+                                            "daemon.pid", "daemon.log", "errors.log"})
+        if writable_churn:
+            warns.append(f"repo {name} on {vol}: cluster {cs//1024}KB > 64KB with WRITABLE index "
+                         f"(wal/shm/daemon present) — index dir must NOT live on this volume (v3.1 §5.1)")
+        else:
+            warns.append(f"note: repo {name} on {vol} cluster {cs//1024}KB — read-only single-file "
+                         f"index tolerated; keep daemon/write path on 4KB NTFS (C:/D:)")
     return warns
 
 # ---------------------------------------------------------------- G0 governance
@@ -157,6 +176,7 @@ class CGMcpSession:
         self.q = None
         self.iid = 0
         self.lock = threading.Lock()
+        self._daemon_pids = None  # pids spawned during our lifetime (safe to reap)
 
     def start(self):
         with self.lock:
@@ -203,16 +223,75 @@ class CGMcpSession:
             r = self._recv(timeout)
         if not r or "result" not in r:
             raise CGQueryError(f"explore failed: {json.dumps(r)[:200] if r else 'timeout'}")
+        try:
+            self._note_daemon_pid(project_path)
+        except Exception:
+            pass
         return r["result"]["content"][0].get("text", "")
 
     def stop(self):
+        """Terminate the shim AND any daemon it spawned (Windows: kill the whole
+        process tree via taskkill /T — plain terminate() leaks the detached
+        daemon child, observed as live node.exe with writer.pid long after stop)."""
         with self.lock:
             if self.proc and self.proc.poll() is None:
-                self.proc.terminate()
+                pid = self.proc.pid
+                try:
+                    # tree-kill first: /T takes children, /F is required for
+                    # console-less node daemons that ignore console events
+                    subprocess.run(["taskkill", "/PID", str(pid), "/T", "/F"],
+                                   capture_output=True, timeout=15)
+                except Exception:
+                    self.proc.terminate()
                 try:
                     self.proc.wait(5)
                 except Exception:
-                    self.proc.kill()
+                    try:
+                        self.proc.kill()
+                    except Exception:
+                        pass
+                # belt & braces: sweep writer.pid/daemon.pid files we created
+                for rp in REPO_ROOTS.values():
+                    for pidfile in ("daemon.pid", "writer.pid"):
+                        f = Path(rp) / ".codegraph" / pidfile
+                        try:
+                            if f.exists():
+                                d = json.loads(f.read_text(encoding="utf-8"))
+                                dp = d.get("pid")
+                                if dp and dp != pid:
+                                    k = ctypes.windll.kernel32
+                                    h = k.OpenProcess(0x1000, False, dp)
+                                    if h:  # alive and not our direct child
+                                        # only reap pids this session is
+                                        # responsible for (spawned during our
+                                        # lifetime); leave foreign ones alone
+                                        if getattr(self, "_daemon_pids", None) and dp in self._daemon_pids:
+                                            subprocess.run(
+                                                ["taskkill", "/PID", str(dp), "/T", "/F"],
+                                                capture_output=True, timeout=15)
+                                        k.CloseHandle(h)
+                        except Exception:
+                            pass
+            self.proc = None
+
+    def _note_daemon_pid(self, repo_path: str):
+        """Track daemon/writer pids created while this session is alive (for safe
+        reaping). CG writes daemon.pid or writer.pid depending on version."""
+        try:
+            for name in ("daemon.pid", "writer.pid"):
+                f = Path(repo_path) / ".codegraph" / name
+                if f.exists():
+                    try:
+                        d = json.loads(f.read_text(encoding="utf-8"))
+                    except Exception:
+                        continue
+                    dp = d.get("pid")
+                    if dp and dp != (self.proc.pid if self.proc else None):
+                        if self._daemon_pids is None:
+                            self._daemon_pids = set()
+                        self._daemon_pids.add(dp)
+        except Exception:
+            pass
 
 CG = CGMcpSession()
 
@@ -340,9 +419,24 @@ def t_contracts(a):
 
 def t_cross_impact(a):
     """Cross-repo fan-out: for a repo+symbol, which contracts' OTHER endpoints
-    are therefore affected (local subgraph via calls edges)."""
-    repo = a["repo"]; symbol = a["symbol"]
+    are therefore affected (local subgraph via calls edges).
+    Diff mode: pass ref=<git-ref> (no symbol) to evaluate the repo's changed
+    files instead — mirrors `python src/cross_sync.py --detect-changes`."""
     cs = load_contracts()
+    repo = a["repo"]
+    ref = a.get("ref")
+    if ref and not a.get("symbol"):
+        # diff mode: reuse the P2 local-subgraph implementation
+        # (lazy import — cross_sync imports mcp_server at module level)
+        import cross_sync
+        changed = cross_sync.changed_files(repo, ref)
+        if not changed:
+            return json.dumps({"input": f"{repo} diff {ref}", "changed_files": 0,
+                              "cross_impacts": []}, ensure_ascii=False, indent=1)
+        result = cross_sync.local_subgraph_impact(cs, repo, changed)
+        return json.dumps({"input": f"{repo} diff {ref}", "changed_files": len(changed),
+                           **result}, ensure_ascii=False, indent=1)
+    symbol = a["symbol"]
     hits = []
     for c in cs:
         eps = [c.provider] + list(c.consumers)
@@ -401,7 +495,7 @@ TOOLS = {
     "maw_node": (t_node, {"name": "str", "repo": "str?", "file": "str?", "maxChars": "int?"}),
     "maw_impact": (t_impact, {"symbol": "str", "repo": "str?", "maxChars": "int?"}),
     "maw_contracts": (t_contracts, {}),
-    "maw_cross_impact": (t_cross_impact, {"repo": "str", "symbol": "str"}),
+    "maw_cross_impact": (t_cross_impact, {"repo": "str", "symbol": "str", "ref": "str"}),
     "maw_contract_check": (t_contract_check, {}),
     "maw_status": (t_status, {}),
 }

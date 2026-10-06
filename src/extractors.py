@@ -157,33 +157,59 @@ def _clean_ts_path(raw: str) -> str:
     glued ?literal → cut."""
     p = raw
     if re.search(r"\$\{[^}]*\?", p) or "`" in p:
+        # ternary / nested-template chunk — query conditional; strip from it on
         p = re.sub(r"\$\{.*$", "", p)
-    else:
+    elif "?" in p:
+        p = p.split("?")[0]  # literal ? begins a query string, built anywhere
+    if not re.search(r"\$\{[^}]*\?", p) and "`" not in p:
         def repl(m):
             expr = m.group(1).strip()
             if re.fullmatch(r"[a-z_]\w*", expr) and expr.lower() in (
                     "suffix", "qs", "query", "params", "querystring", "q", "search"):
+                return ""
+            # query-building CALLS: profileQuery(p), targetQuery(t), qs()…
+            cm = re.fullmatch(r"([a-z_]\w*)\s*\([^()]*\)", expr)
+            if cm and re.search(r"query|qs|search|params", cm.group(1), re.I):
                 return ""
             return "{param}"
         p = re.sub(r"\$\{([^}]*)\}", repl, p)
     return p.split("?")[0]
 
 
+def _extract_call_window(src: str, start: int, budget: int = 400) -> str:
+    """Paren/bracket-depth walk from just inside a call's '(' to its matching ')'.
+    Returns the args window (used for method: lookahead across newlines)."""
+    i, depth = start, 1
+    while i < len(src) and depth > 0 and i - start < budget:
+        c = src[i]
+        if c in "([{":
+            depth += 1
+        elif c in ")]}":
+            depth -= 1
+        i += 1
+    return src[start:i]
+
+
 def ts_request_template(src: str, file: str) -> list:
     """request<T>(`/api/x/${id}`, { method: 'PATCH', ... }) — client API wrapper.
     Path params may be template literals; method defaults to GET."""
     out = []
-    pat = (r"request(?:<[^>]*(?:<[^>]*>)?[^>]*>)?\(\s*[\"'`]([^\"'`]+)[\"'`]"
-           r"(?:\s*,\s*\{(?:(?!\}\)).)*?method:\s*[\"'](\w+)[\"'])?")
+    pat = (r"request(?:<[^>]*(?:<[^>]*>)?[^>]*>)?\(\s*[\"'`]([^\"'`]+)[\"'`]")
     for m in re.finditer(pat, src, re.S):
-        raw_path, verb = m.group(1), m.group(2) or "GET"  # omitted method = GET
+        raw_path, verb = m.group(1), "GET"
+        # method lives anywhere inside this request(...) args window (even
+        # several lines below the path literal — multi-line calls)
+        window = _extract_call_window(src, m.end())
+        vm = re.search(r"method:\s*[\"'](\w+)[\"']", window)
+        if vm:
+            verb = vm.group(1)
         path = _clean_ts_path(raw_path)
         line = src[: m.start()].count("\n") + 1
         out.append(Endpoint(verb.upper(), "/" + path.lstrip("/"), "request-wrapper",
                             file, line, "consumer", "TS-REQUEST-TEMPLATE"))
     # appendQuery('path', params) / withQuery(...) helpers — GET semantics
     for m in re.finditer(
-        r"(?:appendQuery|withQuery|buildQuery)\(\s*[\"'`]([^\"'`]+)[\"'`]", src):
+        r"(?:appendQuery|withQuery|buildQuery|appendProfile)\(\s*[\"'`]([^\"'`]+)[\"'`]", src):
         raw_path = m.group(1)
         if not raw_path.startswith("/"):  # only absolute API paths
             continue
@@ -244,18 +270,19 @@ def ts_request_template(src: str, file: str) -> list:
         line = src[: m.start()].count("\n") + 1
         out.append(Endpoint(v, "/" + path.lstrip("/"), "path-builder",
                             file, line, "consumer", "TS-REQUEST-TEMPLATE"))
-    # fetch() calls (file uploads/downloads bypassing request()): fetch(url)
-    # and fetch(`${baseUrl}/api/...`, { method: 'POST' })
+    # fetch() calls (file uploads/downloads bypassing request()): fetch(url),
+    # fetch(`${baseUrl}/api/...`, { method: 'POST' }) — strip the ${base} prefix,
+    # then normalize the remaining literal template. Also covers fetch wrappers
+    # named *Fetch / fetchAuthenticated* (themeFetch, fetchAuthenticatedBlob...).
     for m in re.finditer(
-        r"(?:await\s+|return\s+|=)?fetch\(\s*(?:[\"'`]([^\"'`]+)[\"'`]|\$\{[^}]+\}([\"'`][^\"'`]+)[\"'`])",
+        r"(?:await\s+|return\s+|=)?\w*[Ff]etch\w*\(\s*(?:[\"'`]([^\"'`]+)[\"'`]|\$\{[^}]+\}([\"'`][^\"'`]+)[\"'`])",
         src):
         raw_path = m.group(1) or m.group(2) or ""
         if not raw_path.startswith("/"):
             continue
-        tail = src[m.end(): m.end() + 300]
-        vm = re.search(r"method:\s*[\"'](\w+)[\"']", tail.split(")")[0] if ")" in tail else tail)
-        path = re.sub(r"\$\{[^}]*\}", "{param}", raw_path)
-        path = re.sub(r"(?<!/)\$\{[^}]*\}", "", path).split("?")[0]
+        window = _extract_call_window(src, m.end())
+        vm = re.search(r"method:\s*[\"'](\w+)[\"']", window)
+        path = _clean_ts_path(raw_path)
         v = (vm.group(1) if vm else "GET").upper()
         line = src[: m.start()].count("\n") + 1
         out.append(Endpoint(v, "/" + path.lstrip("/"), "fetch-call",
@@ -277,6 +304,44 @@ def ts_request_template(src: str, file: str) -> list:
             line = src[: m.start()].count("\n") + 1
             out.append(Endpoint(v, raw_path, "endpoint-const",
                                 file, line, "consumer", "TS-REQUEST-TEMPLATE"))
+    return out
+
+
+# ---------------------------------------------------------------- ARKTS-OHOS-HTTP
+def arkts_ohos_http(src: str, file: str) -> list:
+    """HarmonyOS @ohos.net.http consumer form:
+    const req = http.createHttp();
+    req.request(`https://host/api/x`, { method: http.RequestMethod.POST, ... })
+    CodeGraph yields ZERO symbols for .ets files, so this extractor is the only
+    contract path for HarmonyOS endpoints."""
+    out = []
+    # local URL variables: const testUrl = `https://host/path`;
+    url_vars = {}
+    for m in re.finditer(
+        r"(?:const|let)\s+(\w+)\s*=\s*[\"'`]([^\"'`]+)[\"'`]", src):
+        if "://" in m.group(2) or m.group(2).startswith("/"):
+            url_vars[m.group(1)] = m.group(2)
+    for m in re.finditer(
+        r"\.request\(\s*(?:[\"'`]([^\"'`]+)[\"'`]|(\w+)\s*[,)])", src):
+        raw_path = m.group(1)
+        if not raw_path and m.group(2) and m.group(2) in url_vars:
+            raw_path = url_vars[m.group(2)]
+        # only http-module requests: import may be @ohos.net.http or @kit.NetworkKit
+        if "@ohos.net.http" not in src and "@kit.NetworkKit" not in src:
+            continue
+        window = _extract_call_window(src, m.end())
+        vm = re.search(r"method\s*:\s*http\.RequestMethod\.(\w+)", window)
+        # variable indirection: .request(testUrl, ...)
+        vm2 = re.match(r"\s*(\w+)\s*[,)]", window)
+        if vm2 and vm2.group(1) in url_vars:
+            raw_path = url_vars[vm2.group(1)]
+        verb = vm.group(1) if vm else "GET"
+        # full URLs: keep only the path part for route comparison
+        path = re.sub(r"^[a-z]+://[^/]+", "", raw_path)
+        path = _clean_ts_path(path)
+        line = src[: m.start()].count("\n") + 1
+        out.append(Endpoint(verb.upper(), "/" + path.lstrip("/"), "ohos-http",
+                            file, line, "consumer", "ARKTS-OHOS-HTTP"))
     return out
 
 
@@ -306,12 +371,18 @@ def scan_repo(repo_root: Path) -> list:
         if any(x in rel for x in ("/.git/", "/.codegraph/", "/.aoci/", "node_modules")):
             continue
         try:
-            if p.suffix == ".py":
+            if p.suffix == ".ets":
+                src = read(p)
+                eps += arkts_ohos_http(src, rel)
+            elif p.suffix == ".py":
                 src = read(p)
                 eps += py_class_route(src, rel)
             elif p.suffix in (".kt", ".kts"):
                 src = read(p)
                 eps += kt_url_builder(src, rel)
+            elif p.suffix == ".ets":
+                src = read(p)
+                eps += arkts_ohos_http(src, rel)
             elif p.suffix == ".swift":
                 src = read(p)
                 eps += sw_request_wrapper(src, rel)
