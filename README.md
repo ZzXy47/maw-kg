@@ -54,3 +54,5 @@ python tests/p0_green_bridge.py
 - Full regression: 6 suites green
 
 Known open: 19 client-string route pairs unextractable by regex (tree-sitter is the P5 path); ekko Android shell repo not in this repo (APK build unverified).
+- O-round 2026-10-06 (d462cd1): prewarm (first explore 22.8s→4.9s), maw_detect_changes (O-2, diff→symbols+contract fan-out, quiesce-sync-lock-retry), maw_cognition_search (O-3, FRAS keyword/tag), orphan-daemon reap (O-5); tool count 8→10; o_fix 8/8 + bakeoff 12/12 + all suites green
+- Remaining: O-4 tree-sitter (P5); 19 client-string pairs
