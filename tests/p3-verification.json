@@ -1,0 +1,51 @@
+{
+  "phase": "P3",
+  "all_pass": true,
+  "results": [
+    {
+      "name": "1 PY-CLASS-ROUTE finds POST /api/mobile_app/registrations",
+      "pass": true,
+      "detail": "[Endpoint(method='POST', path='/api/mobile_app/registrations', symbol='RegistrationsView.post', file='http_api.py', line=64, role='provider', source='PY-CLASS-ROUTE')]"
+    },
+    {
+      "name": "2 KT-URL-BUILDER finds /api/mobile_app/registrations",
+      "pass": true,
+      "detail": "[Endpoint(method='', path='/api/mobile_app/registrations', symbol='url', file='IntegrationRepositoryImpl.kt', line=138, role='consumer', source='KT-URL-BUILDER'), Endpoint(method='"
+    },
+    {
+      "name": "3 KT-RETROFIT-URL: registerDevice verb=POST + @Url",
+      "pass": true,
+      "detail": "[{'verb': 'POST', 'fun': 'registerDevice', 'has_url_param': True, 'line': 23, 'file': 'IntegrationService.kt', 'extractor': 'KT-RETROFIT-URL'}]"
+    },
+    {
+      "name": "4 SW-REQUEST-WRAPPER finds POST /mobile_app/registrations",
+      "pass": true,
+      "detail": "[Endpoint(method='POST', path='/mobile_app/registrations', symbol='request-wrapper', file='HAAPI.swift', line=565, role='consumer', source='SW-REQUEST-WRAPPER')]"
+    },
+    {
+      "name": "5 SW-ARRAY-PATH finds /mobile_app/registrations",
+      "pass": true,
+      "detail": "[Endpoint(method='', path='/mobile_app/registrations', symbol='array-path', file='WatchDeviceRegistrar.swift', line=104, role='consumer', source='SW-ARRAY-PATH'), Endpoint(method='"
+    },
+    {
+      "name": "6a PATH-NORM: /api/x == /x",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "6b PATH-NORM: /api/web_hook/{id} == /api/web_hook/{webhook_id}",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "6c PATH-NORM negative: /other != /x",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "7 INTEGRATION: provider+2 consumers auto-discovered via extractors+PATH-NORM",
+      "pass": true,
+      "detail": "provider=1 consumers=2"
+    }
+  ]
+}

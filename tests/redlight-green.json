@@ -1,0 +1,36 @@
+{
+  "phase": "P3-redlight",
+  "all_green": true,
+  "results": [
+    {
+      "name": "A1 ha-core: route/endpoint extracted",
+      "green": true,
+      "detail": ""
+    },
+    {
+      "name": "A2 ha-android: consumer extracted (builder chain)",
+      "green": true,
+      "detail": ""
+    },
+    {
+      "name": "A3 ha-ios: consumers extracted (wrapper + array-path)",
+      "green": true,
+      "detail": ""
+    },
+    {
+      "name": "A4 auto-contract assembly: 1 provider + 2 consumers",
+      "green": true,
+      "detail": "p=1 c=4"
+    },
+    {
+      "name": "A5 real-binding (file:line, no synthetic IDs)",
+      "green": true,
+      "detail": ""
+    },
+    {
+      "name": "A6 cross-impact: registration change → consumers flagged",
+      "green": true,
+      "detail": "['mobile-app-registration', 'mobile-app-watch-registration']"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+version: 1
+# MAW-KG L4 cognition entries — FRAS compact-tag format (AOCI-informed), contract-scoped.
+# Alignment metric = contract coverage (NOT whole-repo file count) — v3.1 §2 L4.
+contracts:
+  mobile-app-registration:
+    tag: EG7T
+    entry: "http_api.py[EG7T]: F:mobile_app 设备注册 REST 端点,校验请求体并签发 webhook_id/云钩子/加密密钥 | R:code:homeassistant/components/mobile_app/__init__.py | A:POST /api/mobile_app/registrations | S:响应字段由 CONF_* 常量序列化,local_only 用户跳过云钩子签发"
+  mobile-app-watch-registration:
+    tag: EG6S
+    entry: "WatchDeviceRegistrar.swift[EG6S]: F:手表侧独立设备注册,POST 同一注册端点,处理设备名冲突重试与 404 组件缺失 | R:code:Sources/Shared/API/HAAPI.swift | A:POST /api/mobile_app/registrations | S:注册失败不得盲目重试——每次成功注册都会在服务端创建新设备"
+  mobile-app-webhook-update:
+    tag: EG6M
+    entry: "webhook.py[EG6M]: F:webhook 更新注册状态入口,处理 update_registration 与空体/410/404 重注册语义 | R:code:homeassistant/components/mobile_app/http_api.py | A:POST /api/web_hook/{webhook_id} | S:update_registration 返回空体时触发重注册,410/404 同"

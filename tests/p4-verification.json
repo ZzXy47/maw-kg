@@ -1,0 +1,31 @@
+{
+  "phase": "P4",
+  "all_pass": true,
+  "results": [
+    {
+      "name": "1 full alignment (3/3)",
+      "pass": true,
+      "detail": "{'contracts_registered': 3, 'entries_present': 3, 'coverage': 1.0, 'aligned': True, 'drift': {'missing': [], 'stale': [], 'orphan': []}, 'governance_state': 'al"
+    },
+    {
+      "name": "2 partial authoring → coverage 0.67, state=partial (NOT red)",
+      "pass": true,
+      "detail": "{'contracts_registered': 3, 'entries_present': 2, 'coverage': 0.67, 'aligned': False, 'drift': {'missing': ['mobile-app-webhook-update'], 'stale': [], 'orphan':"
+    },
+    {
+      "name": "3 stale drift flagged (hash mismatch)",
+      "pass": true,
+      "detail": "[{'contract': 'mobile-app-registration', 'reason': 'provider file changed since authoring', 'recorded': '000000000000', 'current': '8a78b21a8959'}]"
+    },
+    {
+      "name": "4 orphan drift flagged",
+      "pass": true,
+      "detail": "['ghost-contract']"
+    },
+    {
+      "name": "5 restore → aligned again",
+      "pass": true,
+      "detail": "aligned"
+    }
+  ]
+}
