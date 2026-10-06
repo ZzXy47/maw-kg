@@ -1,0 +1,81 @@
+{
+  "phase": "P1",
+  "all_pass": true,
+  "results": [
+    {
+      "name": "1a init handshake",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "1b eight tools listed",
+      "pass": true,
+      "detail": "['maw_explore', 'maw_query', 'maw_node', 'maw_impact', 'maw_contracts', 'maw_cross_impact', 'maw_contract_check', 'maw_status']"
+    },
+    {
+      "name": "2a maw_explore works",
+      "pass": true,
+      "detail": "5.6s 8251ch"
+    },
+    {
+      "name": "2b maw_query works",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "2c maw_node works",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "2d maw_impact works",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "3 maxChars budget caps ~20K explore",
+      "pass": true,
+      "detail": "8251ch"
+    },
+    {
+      "name": "4 stale lock auto-cleaned (dead pid 99999999)",
+      "pass": true,
+      "detail": "{\"repo\": \"ha-core\", \"lock\": \"E:\\\\CrossDevice_Agent_GitNexus_Pilot\\\\repos\\\\home-assistant-core\\\\.codegraph\\\\writer.pid\", "
+    },
+    {
+      "name": "5 G0-④ retry: 2 transient failures then success",
+      "pass": true,
+      "detail": "attempts=3"
+    },
+    {
+      "name": "6 env selfcheck flags 4MB clusters",
+      "pass": true,
+      "detail": "{\n \"cluster_warnings\": [\n  \"repo ha-core on E:/: cluster 4096KB > 64KB — index dirs must NOT live on this volume (v3.1 §5.1)\",\n  \"repo ha-android on E"
+    },
+    {
+      "name": "7 FP probe: no fabricated hits",
+      "pass": true,
+      "detail": "{\"query\": \"ZzNotARealSymbolXyzzy\", \"result\": \"no-match\", \"note\": \"no symbol in this index matches any query term (exact "
+    },
+    {
+      "name": "8a maw_contracts lists 3",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "8b maw_contract_check ok",
+      "pass": true,
+      "detail": "fail=0"
+    },
+    {
+      "name": "8c cross_impact reaches 2 contracts",
+      "pass": true,
+      "detail": "['mobile-app-registration', 'mobile-app-watch-registration']"
+    },
+    {
+      "name": "9 status shows extraction versions",
+      "pass": true,
+      "detail": "['ha-core', 'ha-android', 'ha-ios']"
+    }
+  ]
+}
