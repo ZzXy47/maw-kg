@@ -8,14 +8,14 @@
       "detail": ""
     },
     {
-      "name": "1b eight tools listed",
+      "name": "1b ten tools listed (8 core + 2 O-round)",
       "pass": true,
-      "detail": "['maw_explore', 'maw_query', 'maw_node', 'maw_impact', 'maw_contracts', 'maw_cross_impact', 'maw_contract_check', 'maw_status']"
+      "detail": "['maw_explore', 'maw_query', 'maw_node', 'maw_impact', 'maw_contracts', 'maw_cognition_search', 'maw_detect_changes', 'maw_cross_impact', 'maw_contract_check', 'maw_status']"
     },
     {
       "name": "2a maw_explore works",
       "pass": true,
-      "detail": "7.0s 8251ch"
+      "detail": "0.5s 8251ch"
     },
     {
       "name": "2b maw_query works",

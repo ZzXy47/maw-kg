@@ -53,7 +53,7 @@ send({"jsonrpc":"2.0","id":2,"method":"tools/list"})
 tl=recv()
 tlist = tl.get("result",{}).get("tools") if isinstance(tl,dict) else None
 tools=[t["name"] for t in tlist] if tlist else []
-chk("1b eight tools listed", len(tools)==8 and all(t.startswith("maw_") for t in tools), tools)
+chk("1b ten tools listed (8 core + 2 O-round)", len(tools)==10 and all(t.startswith("maw_") for t in tools), tools)
 
 # 2 — live tool calls
 t0=time.time(); out,_=call("maw_explore",{"query":"registerDevice flow","repo":"ha-android"}); dt=time.time()-t0

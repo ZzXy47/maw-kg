@@ -273,6 +273,24 @@ class CGMcpSession:
                         except Exception:
                             pass
             self.proc = None
+            # M-③ extension: tree-kill tracked daemons even if orphaned (shim
+            # already dead → taskkill /T on shim pid can't reach them)
+            for dp in (self._daemon_pids or set()):
+                try:
+                    k = ctypes.windll.kernel32
+                    h = k.OpenProcess(0x1000, False, dp)
+                    if h:
+                        k.CloseHandle(h)
+                        subprocess.run(["taskkill", "/PID", str(dp), "/T", "/F"],
+                                       capture_output=True, timeout=15)
+                except Exception:
+                    pass
+            self._daemon_pids = None
+
+    def quiesce(self):
+        """Stop session + reap daemons (used before CLI sync which needs the
+        DB lock released). Next query lazily restarts the daemon."""
+        self.stop()
 
     def _note_daemon_pid(self, repo_path: str):
         """Track daemon/writer pids created while this session is alive (for safe
@@ -294,6 +312,16 @@ class CGMcpSession:
             pass
 
 CG = CGMcpSession()
+
+
+def _prewarm():
+    """O-1: start the CG daemon + MCP handshake at server initialize, so the
+    first query rides a warm session. Failure is non-fatal (lazy path remains)."""
+    try:
+        CG.start()
+    except Exception:
+        pass
+
 
 # ---------------------------------------------------------------- db helpers
 def db_path(repo: str) -> Path:
@@ -417,6 +445,38 @@ def t_contracts(a):
             lines.append(f"   C {ep.repo}:{ep.symbol}")
     return "\n".join(lines)
 
+def t_cognition_search(a):
+    """O-3: keyword/tag search over contracts/cognition.yaml FRAS entries.
+    AOCI aoci_search equivalent, on our own L4 layer. Case-insensitive substring
+    match on keyword OR tag; returns entry text with contract context."""
+    import yaml
+    kw = (a.get("keyword") or "").strip().lower()
+    tag = (a.get("tag") or "").strip().lower()
+    if not kw and not tag:
+        return json.dumps({"error": "keyword or tag required"}, ensure_ascii=False)
+    cog_path = Path(__file__).resolve().parent.parent / "contracts" / "cognition.yaml"
+    if not cog_path.exists():
+        return json.dumps({"results": [], "note": "cognition.yaml not present"}, ensure_ascii=False)
+    cog = yaml.safe_load(cog_path.read_text(encoding="utf-8")) or {}
+    entries = cog.get("contracts", {})
+    hits = []
+    for cid, e in entries.items():
+        etag = str(e.get("tag", "")).lower()
+        text = str(e.get("entry", ""))
+        tlow = text.lower()
+        if (kw and (kw in tlow or kw in cid.lower())) or (tag and tag in etag):
+            hits.append({"contract": cid, "tag": e.get("tag", ""), "entry": text})
+    return json.dumps({"query": {"keyword": kw, "tag": tag}, "results": hits},
+                      ensure_ascii=False, indent=1)
+
+def t_detect_changes(a):
+    """O-2: git diff → changed SYMBOLS (line-span intersection with the nodes
+    table) + exact-name contract fan-out. Mirrors src/detect_changes.py CLI."""
+    import detect_changes as DC
+    repo = a["repo"]
+    ref = a.get("ref", "HEAD")
+    return json.dumps(DC.run(repo, ref), ensure_ascii=False, indent=1)
+
 def t_cross_impact(a):
     """Cross-repo fan-out: for a repo+symbol, which contracts' OTHER endpoints
     are therefore affected (local subgraph via calls edges).
@@ -495,6 +555,8 @@ TOOLS = {
     "maw_node": (t_node, {"name": "str", "repo": "str?", "file": "str?", "maxChars": "int?"}),
     "maw_impact": (t_impact, {"symbol": "str", "repo": "str?", "maxChars": "int?"}),
     "maw_contracts": (t_contracts, {}),
+    "maw_cognition_search": (t_cognition_search, {"keyword": "str?", "tag": "str?"}),
+    "maw_detect_changes": (t_detect_changes, {"repo": "str", "ref": "str?"}),
     "maw_cross_impact": (t_cross_impact, {"repo": "str", "symbol": "str", "ref": "str"}),
     "maw_contract_check": (t_contract_check, {}),
     "maw_status": (t_status, {}),
@@ -506,6 +568,8 @@ DESC = {
     "maw_node": "One symbol's source + caller/callee trail.",
     "maw_impact": "Single-repo blast radius for a symbol.",
     "maw_contracts": "List registered cross-repo contracts.",
+    "maw_cognition_search": "Keyword/tag search over L4 FRAS cognition entries (contracts/cognition.yaml).",
+    "maw_detect_changes": "git diff → changed SYMBOLS (line-span mapped) + exact-name contract fan-out.",
     "maw_cross_impact": "Given repo+symbol, list contracts whose other endpoints are affected.",
     "maw_contract_check": "Verify every contract binding (exact match); non-zero on failure.",
     "maw_status": "Env self-check + per-repo lock governance + index versions + daemon state.",
@@ -542,6 +606,9 @@ def serve():
             resp = {"jsonrpc": "2.0", "id": rid, "result": {
                 "capabilities": {"tools": {"listChanged": False}},
                 "serverInfo": {"name": "maw-kg", "version": "1.0.0"}}}
+            # O-1/O-5: prewarm the CG daemon at MCP initialize so the first
+            # maw_explore doesn't pay cold-start (22.8s → ~6s target).
+            threading.Thread(target=_prewarm, daemon=True).start()
         elif method == "tools/list":
             resp = {"jsonrpc": "2.0", "id": rid, "result": {"tools": [
                 {"name": n, "description": DESC[n], "inputSchema": make_schema(TOOLS[n][1])}

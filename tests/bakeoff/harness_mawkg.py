@@ -76,6 +76,15 @@ orig = p.read_text(encoding='utf-8')
 t0 = time.time()
 p.write_text(orig + '\nfun mawFreshnessProbe(): Int = 42\n', encoding='utf-8')
 try:
+    # quiesce any resident CG daemon (from our own earlier MCP sessions) that
+    # holds the DB lock — otherwise CLI sync fails with rc=1 "file lock"
+    try:
+        sys.path.insert(0, 'D:/maw-kg/src')
+        import mcp_server as _MS
+        _MS.CG.quiesce()
+        time.sleep(1.5)
+    except Exception:
+        pass
     r = subprocess.run(['node', 'E:/CrossDevice_Agent_GitNexus_Pilot/tool-codegraph/node_modules/@colbymchenry/codegraph/npm-shim.js', 'sync'],
                        capture_output=True, text=True, cwd=repo, timeout=300,
                        env={**__import__('os').environ, 'PATH': 'C:/Program Files/nodejs;' + __import__('os').environ.get('PATH', ''), 'CODEGRAPH_TELEMETRY': '0'})
