@@ -597,10 +597,15 @@ def serve():
         pass
 
     def make_schema(props):
+        # "str" → required string; "str?" → optional string; "int?" → optional
+        # integer. (The "?"-suffix must be stripped BEFORE the type compare —
+        # "str?" used to fall through to integer and break MCP validation.)
+        def t(v):
+            return "string" if v.rstrip("?") == "str" else "integer"
         return {"type": "object",
-                "properties": {k: {"type": "string" if v == "str" else "integer"}
-                               for k, v in props.items()},
-                "required": [k for k, v in props.items() if not k.startswith("repo") and v == "str" and k in ("query", "name", "symbol")]}
+                "properties": {k: {"type": t(v)} for k, v in props.items()},
+                "required": [k for k, v in props.items()
+                             if v == "str" and k in ("query", "name", "symbol")]}
 
     def line_out(obj):
         sys.stdout.write(json.dumps(obj, ensure_ascii=False) + "\n")
@@ -622,7 +627,12 @@ def serve():
         if rid is None:
             continue  # notification
         if method == "initialize":
+            # SDK validation (pydantic InitializeResult) requires protocolVersion
+            # in the response — echo the client's version, default 2024-11-05.
+            client_pv = ((req.get("params") or {}).get("protocolVersion")
+                         or "2024-11-05")
             resp = {"jsonrpc": "2.0", "id": rid, "result": {
+                "protocolVersion": client_pv,
                 "capabilities": {"tools": {"listChanged": False}},
                 "serverInfo": {"name": "maw-kg", "version": "1.0.0"}}}
             # O-1/O-5: prewarm the CG daemon at MCP initialize so the first

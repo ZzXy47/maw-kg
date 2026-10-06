@@ -15,7 +15,7 @@
     {
       "name": "2a maw_explore works",
       "pass": true,
-      "detail": "0.5s 8251ch"
+      "detail": "6.3s 8251ch"
     },
     {
       "name": "2b maw_query works",
