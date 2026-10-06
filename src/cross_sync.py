@@ -23,6 +23,10 @@ sys.path.insert(0, str(ROOT / "src"))
 import contract_check as CC  # noqa: E402
 from mcp_server import REPO_ROOTS, db_path, RepoGovernor  # noqa: E402
 
+import shutil as _shutil
+GIT_EXE = _shutil.which("git") or r"C:/Program Files/Git/cmd/git.exe"
+
+
 MAX_SUBGRAPH_DEPTH = 4
 
 
@@ -64,7 +68,7 @@ def sync_contracts(contracts) -> dict:
 
 
 def changed_files(repo: str, ref: str = "HEAD") -> set:
-    r = subprocess.run(["git", "-C", REPO_ROOTS[repo], "diff", "--name-only", ref],
+    r = subprocess.run([GIT_EXE, "-C", REPO_ROOTS[repo], "diff", "--name-only", ref],
                        capture_output=True, text=True)
     return {l.strip().replace("\\", "/") for l in r.stdout.splitlines() if l.strip()}
 

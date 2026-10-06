@@ -149,6 +149,18 @@ class RepoGovernor:
 class CGQueryError(Exception):
     pass
 
+def _node_env() -> dict:
+    """Env for node children: compose over os.environ (MCP-host baseline
+    survives) but GUARANTEE the vars node native modules need on Windows —
+    missing SystemRoot crashes them with rc 134."""
+    e = {**os.environ, "CODEGRAPH_TELEMETRY": "0",
+         "PATH": "C:/Program Files/nodejs;" + os.environ.get("PATH", "")}
+    if os.name == "nt":
+        e.setdefault("SYSTEMROOT", "C:\\Windows")
+        e.setdefault("SYSTEMDRIVE", "C:")
+    return e
+
+
 def cg_cli(args: list, cwd: Path, timeout: int = 180) -> str:
     """Run codegraph CLI with transient-failure retry (heavy-I/O concurrency)."""
     last = None
@@ -157,8 +169,7 @@ def cg_cli(args: list, cwd: Path, timeout: int = 180) -> str:
             [NODE_EXE, CG_SHIM, *args],
             capture_output=True, text=True, encoding="utf-8", errors="replace",
             cwd=str(cwd), timeout=timeout,
-            env={**os.environ, "CODEGRAPH_TELEMETRY": "0",
-                 "PATH": "C:/Program Files/nodejs;" + os.environ.get("PATH", "")},
+            env=_node_env(),
         )
         if r.returncode == 0 and ("Done" in r.stdout or r.stdout.strip()):
             return r.stdout
@@ -185,8 +196,7 @@ class CGMcpSession:
             self.proc = subprocess.Popen(
                 [NODE_EXE, CG_SHIM, "serve", "--mcp"],
                 stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-                env={**os.environ, "CODEGRAPH_TELEMETRY": "0",
-                     "PATH": "C:/Program Files/nodejs;" + os.environ.get("PATH", "")},
+                env=_node_env(),
             )
             self.q = queue.Queue()
             threading.Thread(target=self._reader, daemon=True).start()

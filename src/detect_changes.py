@@ -15,6 +15,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from mcp_server import REPO_ROOTS, db_path  # noqa: E402
+
+import shutil as _shutil
+GIT_EXE = _shutil.which("git") or r"C:/Program Files/Git/cmd/git.exe"
+
 import contract_check as CC  # noqa: E402
 
 
@@ -50,15 +54,15 @@ CG_SHIM = r"E:/CrossDevice_Agent_GitNexus_Pilot/tool-codegraph/node_modules/@col
 def _hunks(repo: str, ref: str) -> dict:
     """git diff -U0 → {file: [changed_line_numbers]}."""
     r = subprocess.run(
-        ["git", "-C", REPO_ROOTS[repo], "diff", "-U0", "--name-only", ref],
+        [GIT_EXE, "-C", REPO_ROOTS[repo], "diff", "-U0", "--name-only", ref],
         capture_output=True, text=True)
     files = [l.strip().replace("\\", "/") for l in r.stdout.splitlines() if l.strip()]
     r2 = subprocess.run(
-        ["git", "-C", REPO_ROOTS[repo], "diff", "-U0", ref, "--numstat"],
+        [GIT_EXE, "-C", REPO_ROOTS[repo], "diff", "-U0", ref, "--numstat"],
         capture_output=True, text=True)
     # full hunk parse for line numbers:
     r3 = subprocess.run(
-        ["git", "-C", REPO_ROOTS[repo], "diff", "-U0", ref],
+        [GIT_EXE, "-C", REPO_ROOTS[repo], "diff", "-U0", ref],
         capture_output=True, text=True, encoding="utf-8", errors="replace")
     hunks = {}
     cur_file = None

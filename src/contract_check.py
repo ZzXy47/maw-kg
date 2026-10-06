@@ -17,6 +17,8 @@ import json
 import re
 import sqlite3
 import subprocess
+import shutil as _shutil
+GIT_EXE = _shutil.which("git") or r"C:/Program Files/Git/cmd/git.exe"
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -177,7 +179,7 @@ def check_contract(c: Contract) -> list:
 
 def git_diff_files(repo: str, ref: str) -> set:
     r = subprocess.run(
-        ["git", "-C", REPO_ROOTS[repo], "diff", "--name-only", ref],
+        [GIT_EXE, "-C", REPO_ROOTS[repo], "diff", "--name-only", ref],
         capture_output=True, text=True,
     )
     return set(l.strip().replace("\\", "/") for l in r.stdout.splitlines() if l.strip())
