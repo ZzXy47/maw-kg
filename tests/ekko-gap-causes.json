@@ -1,0 +1,67 @@
+{
+  "causes": {
+    "request-in-file": 6,
+    "query-helper": 7,
+    "query-string": 6,
+    "vue-component": 10,
+    "path-builder": 9,
+    "other-string-use": 5
+  },
+  "detail": {
+    "request-in-file": [
+      "POST /api/ekko/skills/import",
+      "GET /api/hermes/data-migrations/windows-appdata",
+      "POST /api/hermes/data-migrations/windows-appdata",
+      "POST /api/hermes/profiles/import",
+      "POST /api/studio/tts/synthesize",
+      "POST /api/studio/uploads"
+    ],
+    "query-helper": [
+      "POST /api/hermes/kanban/dispatch",
+      "POST /api/hermes/kanban/links",
+      "DELETE /api/hermes/kanban/links",
+      "POST /api/hermes/kanban/tasks/bulk",
+      "POST /api/hermes/kanban/complete",
+      "POST /api/hermes/kanban/unblock",
+      "POST /api/hermes/kanban/:id/assign"
+    ],
+    "query-string": [
+      "GET /api/hermes/kanban/search-sessions",
+      "GET /api/studio/files/preview",
+      "POST /api/studio/files/upload",
+      "GET /api/studio/sessions/hermes/:id",
+      "GET /api/studio/sessions/:id/context",
+      "GET /api/theme/background"
+    ],
+    "vue-component": [
+      "POST /api/hermes/kanban",
+      "GET /api/hermes/model-context/:provider/:model",
+      "PUT /api/hermes/model-context",
+      "PUT /api/hermes/skills/:category/:skill",
+      "DELETE /api/hermes/skills/:category/:skill",
+      "GET /api/studio/files/download",
+      "GET /api/studio/logs/:name",
+      "GET /api/studio/usage/pricing",
+      "PUT /api/studio/usage/pricing",
+      "POST /api/studio/workspace/folders/rename"
+    ],
+    "path-builder": [
+      "DELETE /api/hermes/config/providers/:poolKey",
+      "GET /api/hermes/bundles",
+      "POST /api/hermes/bundles",
+      "DELETE /api/hermes/bundles/:commandName",
+      "POST /api/hermes/skills/import",
+      "GET /api/studio/group-chat/rooms/:roomId",
+      "GET /api/studio/workspace/folders",
+      "POST /api/studio/workspace/folders",
+      "DELETE /api/studio/workspace/folders"
+    ],
+    "other-string-use": [
+      "GET /api/studio/sessions/search",
+      "GET /api/studio/sessions/:id",
+      "DELETE /api/studio/sessions/:id",
+      "POST /api/studio/tts",
+      "GET /api/studio/workflows"
+    ]
+  }
+}

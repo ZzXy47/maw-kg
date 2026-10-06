@@ -3,8 +3,8 @@
   "head": "0c28364",
   "route_files": 61,
   "providers": 525,
-  "client_api_files": 72,
-  "consumers": 389,
+  "client_api_files": 425,
+  "consumers": 433,
   "matches": [
     {
       "method": "GET",
@@ -29,6 +29,38 @@
       "provider_file": "packages/server/src/modules/coding-agents/routes/agents.ts",
       "consumer_file": "packages/client/src/api/coding-agents/dsh.ts",
       "consumer_line": 27
+    },
+    {
+      "method": "GET",
+      "path": "/api/coding-agents/dsh/agent-presets/:presetId",
+      "provider_symbol": "presets.read",
+      "provider_file": "packages/server/src/modules/coding-agents/routes/agents.ts",
+      "consumer_file": "packages/client/src/api/coding-agents/dsh.ts",
+      "consumer_line": 26
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/coding-agents/dsh/agent-presets/:presetId",
+      "provider_symbol": "presets.remove",
+      "provider_file": "packages/server/src/modules/coding-agents/routes/agents.ts",
+      "consumer_file": "packages/client/src/api/coding-agents/dsh.ts",
+      "consumer_line": 28
+    },
+    {
+      "method": "PUT",
+      "path": "/api/coding-agents/dsh/agent-presets/:presetId/default",
+      "provider_symbol": "presets.makeDefault",
+      "provider_file": "packages/server/src/modules/coding-agents/routes/agents.ts",
+      "consumer_file": "packages/client/src/api/coding-agents/dsh.ts",
+      "consumer_line": 29
+    },
+    {
+      "method": "POST",
+      "path": "/api/coding-agents/dsh/agent-presets/:presetId/location",
+      "provider_symbol": "presets.openLocation",
+      "provider_file": "packages/server/src/modules/coding-agents/routes/agents.ts",
+      "consumer_file": "packages/client/src/api/coding-agents/dsh.ts",
+      "consumer_line": 30
     },
     {
       "method": "GET",
@@ -64,11 +96,35 @@
     },
     {
       "method": "GET",
+      "path": "/api/coding-agents/update-policies",
+      "provider_symbol": "ctrl.updatePolicies",
+      "provider_file": "packages/server/src/modules/coding-agents/routes/agents.ts",
+      "consumer_file": "packages/client/src/api/coding-agents.ts",
+      "consumer_line": 236
+    },
+    {
+      "method": "PUT",
+      "path": "/api/coding-agents/:id/update-policy",
+      "provider_symbol": "ctrl.setUpdatePolicy",
+      "provider_file": "packages/server/src/modules/coding-agents/routes/agents.ts",
+      "consumer_file": "packages/client/src/api/coding-agents.ts",
+      "consumer_line": 237
+    },
+    {
+      "method": "GET",
       "path": "/api/coding-agents",
       "provider_symbol": "ctrl.status",
       "provider_file": "packages/server/src/modules/coding-agents/routes/agents.ts",
       "consumer_file": "packages/client/src/api/coding-agents.ts",
       "consumer_line": 143
+    },
+    {
+      "method": "GET",
+      "path": "/api/coding-agents",
+      "provider_symbol": "ctrl.status",
+      "provider_file": "packages/server/src/modules/coding-agents/routes/agents.ts",
+      "consumer_file": "packages/client/src/api/coding-agents.ts",
+      "consumer_line": 167
     },
     {
       "method": "POST",
@@ -261,6 +317,14 @@
       "provider_file": "packages/server/src/modules/ekko/routes/skills.ts",
       "consumer_file": "packages/client/src/api/ekko/skills.ts",
       "consumer_line": 62
+    },
+    {
+      "method": "GET",
+      "path": "/api/ekko/skills/:name/file",
+      "provider_symbol": "ctrl.file",
+      "provider_file": "packages/server/src/modules/ekko/routes/skills.ts",
+      "consumer_file": "packages/client/src/api/ekko/skills.ts",
+      "consumer_line": 69
     },
     {
       "method": "PUT",
@@ -488,11 +552,27 @@
     },
     {
       "method": "GET",
+      "path": "/api/cron-history",
+      "provider_symbol": "ctrl.listRuns",
+      "provider_file": "packages/server/src/modules/hermes/routes/cron-history.ts",
+      "consumer_file": "packages/client/src/api/hermes/cron-history.ts",
+      "consumer_line": 21
+    },
+    {
+      "method": "GET",
       "path": "/api/cron-history/:jobId/:fileName",
       "provider_symbol": "ctrl.readRun",
       "provider_file": "packages/server/src/modules/hermes/routes/cron-history.ts",
       "consumer_file": "packages/client/src/api/hermes/cron-history.ts",
       "consumer_line": 26
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/jobs",
+      "provider_symbol": "ctrl.list",
+      "provider_file": "packages/server/src/modules/hermes/routes/jobs.ts",
+      "consumer_file": "packages/client/src/api/hermes/jobs.ts",
+      "consumer_line": 181
     },
     {
       "method": "GET",
@@ -567,6 +647,14 @@
       "consumer_line": 48
     },
     {
+      "method": "GET",
+      "path": "/api/hermes/kanban/boards",
+      "provider_symbol": "ctrl.listBoards",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 304
+    },
+    {
       "method": "POST",
       "path": "/api/hermes/kanban/boards",
       "provider_symbol": "ctrl.createBoard",
@@ -589,6 +677,182 @@
       "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
       "consumer_file": "packages/client/src/api/hermes/kanban.ts",
       "consumer_line": 323
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/kanban/stats",
+      "provider_symbol": "ctrl.stats",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 467
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/kanban/assignees",
+      "provider_symbol": "ctrl.assignees",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 472
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/kanban/diagnostics",
+      "provider_symbol": "ctrl.diagnostics",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 431
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/kanban/dispatch",
+      "provider_symbol": "ctrl.dispatch",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 459
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/kanban/search-sessions",
+      "provider_symbol": "ctrl.searchSessions",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/components/hermes/kanban/KanbanTaskDrawer.vue",
+      "consumer_line": 124
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/kanban/links",
+      "provider_symbol": "ctrl.linkTasks",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 399
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hermes/kanban/links",
+      "provider_symbol": "ctrl.unlinkTasks",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 409
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/kanban/tasks/bulk",
+      "provider_symbol": "ctrl.bulkUpdateTasks",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 415
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/kanban",
+      "provider_symbol": "ctrl.list",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 333
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/kanban/:id/attachments",
+      "provider_symbol": "ctrl.listAttachments",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 343
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/kanban/:id/attachments/:attachmentId",
+      "provider_symbol": "ctrl.readAttachment",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 349
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/kanban/:id",
+      "provider_symbol": "ctrl.get",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 338
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/kanban",
+      "provider_symbol": "ctrl.create",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 356
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/kanban/complete",
+      "provider_symbol": "ctrl.complete",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 364
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/kanban/unblock",
+      "provider_symbol": "ctrl.unblock",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 378
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/kanban/:id/block",
+      "provider_symbol": "ctrl.block",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 371
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/kanban/:id/assign",
+      "provider_symbol": "ctrl.assign",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 385
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/kanban/:id/comments",
+      "provider_symbol": "ctrl.addComment",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 392
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/kanban/:id/log",
+      "provider_symbol": "ctrl.taskLog",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 424
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/kanban/:id/reclaim",
+      "provider_symbol": "ctrl.reclaim",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 436
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/kanban/:id/reassign",
+      "provider_symbol": "ctrl.reassign",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 443
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/kanban/:id/specify",
+      "provider_symbol": "ctrl.specify",
+      "provider_file": "packages/server/src/modules/hermes/routes/kanban.ts",
+      "consumer_file": "packages/client/src/api/hermes/kanban.ts",
+      "consumer_line": 450
     },
     {
       "method": "GET",
@@ -687,6 +951,14 @@
       "consumer_line": 142
     },
     {
+      "method": "GET",
+      "path": "/api/hermes/available-models",
+      "provider_symbol": "ctrl.getAvailable",
+      "provider_file": "packages/server/src/modules/hermes/routes/models.ts",
+      "consumer_file": "packages/client/src/api/hermes/system.ts",
+      "consumer_line": 148
+    },
+    {
       "method": "POST",
       "path": "/api/hermes/provider-models",
       "provider_symbol": "ctrl.fetchProviderModelList",
@@ -743,6 +1015,22 @@
       "consumer_line": 320
     },
     {
+      "method": "DELETE",
+      "path": "/api/hermes/custom-model",
+      "provider_symbol": "ctrl.removeCustomModel",
+      "provider_file": "packages/server/src/modules/hermes/routes/models.ts",
+      "consumer_file": "packages/client/src/api/hermes/system.ts",
+      "consumer_line": 333
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/model-context",
+      "provider_symbol": "ctrl.getModelContext",
+      "provider_file": "packages/server/src/modules/hermes/routes/models.ts",
+      "consumer_file": "packages/client/src/api/hermes/model-context.ts",
+      "consumer_line": 15
+    },
+    {
       "method": "PUT",
       "path": "/api/hermes/model-context/:provider/:model",
       "provider_symbol": "ctrl.updateModelContext",
@@ -781,6 +1069,14 @@
       "provider_file": "packages/server/src/modules/hermes/routes/plugins.ts",
       "consumer_file": "packages/client/src/api/hermes/plugins.ts",
       "consumer_line": 36
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/plugins",
+      "provider_symbol": "ctrl.list",
+      "provider_file": "packages/server/src/modules/hermes/routes/plugins.ts",
+      "consumer_file": "packages/client/src/api/hermes/plugins.ts",
+      "consumer_line": 40
     },
     {
       "method": "GET",
@@ -1040,35 +1336,19 @@
     },
     {
       "method": "GET",
-      "path": "/api/hermes/bundles",
-      "provider_symbol": "ctrl.list",
-      "provider_file": "packages/server/src/modules/hermes/routes/skill-bundles.ts",
-      "consumer_file": "packages/client/src/api/hermes/skill-bundles.ts",
-      "consumer_line": 33
-    },
-    {
-      "method": "POST",
-      "path": "/api/hermes/bundles",
-      "provider_symbol": "ctrl.create",
-      "provider_file": "packages/server/src/modules/hermes/routes/skill-bundles.ts",
-      "consumer_file": "packages/client/src/api/hermes/skill-bundles.ts",
-      "consumer_line": 38
-    },
-    {
-      "method": "DELETE",
-      "path": "/api/hermes/bundles/:commandName",
-      "provider_symbol": "ctrl.remove",
-      "provider_file": "packages/server/src/modules/hermes/routes/skill-bundles.ts",
-      "consumer_file": "packages/client/src/api/hermes/skill-bundles.ts",
-      "consumer_line": 46
-    },
-    {
-      "method": "GET",
       "path": "/api/hermes/skills",
       "provider_symbol": "ctrl.list",
       "provider_file": "packages/server/src/modules/hermes/routes/skills.ts",
       "consumer_file": "packages/client/src/api/hermes/skills.ts",
       "consumer_line": 112
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/skills/usage/stats",
+      "provider_symbol": "ctrl.usageStats",
+      "provider_file": "packages/server/src/modules/hermes/routes/skills.ts",
+      "consumer_file": "packages/client/src/api/hermes/skills.ts",
+      "consumer_line": 118
     },
     {
       "method": "GET",
@@ -1103,28 +1383,20 @@
       "consumer_line": 174
     },
     {
-      "method": "PUT",
-      "path": "/api/hermes/skills/:category/:skill",
-      "provider_symbol": "ctrl.updateSkill",
-      "provider_file": "packages/server/src/modules/hermes/routes/skills.ts",
-      "consumer_file": "packages/client/src/api/hermes/skills.ts",
-      "consumer_line": 143
-    },
-    {
-      "method": "DELETE",
-      "path": "/api/hermes/skills/:category/:skill",
-      "provider_symbol": "ctrl.deleteSkill",
-      "provider_file": "packages/server/src/modules/hermes/routes/skills.ts",
-      "consumer_file": "packages/client/src/api/hermes/skills.ts",
-      "consumer_line": 195
-    },
-    {
       "method": "GET",
       "path": "/api/hermes/weixin/qrcode",
       "provider_symbol": "ctrl.getQrcode",
       "provider_file": "packages/server/src/modules/hermes/routes/weixin.ts",
       "consumer_file": "packages/client/src/api/hermes/config.ts",
       "consumer_line": 285
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/weixin/qrcode/status",
+      "provider_symbol": "ctrl.pollStatus",
+      "provider_file": "packages/server/src/modules/hermes/routes/weixin.ts",
+      "consumer_file": "packages/client/src/api/hermes/config.ts",
+      "consumer_line": 289
     },
     {
       "method": "POST",
@@ -1215,6 +1487,14 @@
       "consumer_line": 89
     },
     {
+      "method": "GET",
+      "path": "/api/studio/announcements",
+      "provider_symbol": "ctrl.getAnnouncements",
+      "provider_file": "packages/server/src/modules/studio/routes/announcements.ts",
+      "consumer_file": "packages/client/src/api/studio/announcements.ts",
+      "consumer_line": 15
+    },
+    {
       "method": "PATCH",
       "path": "/api/studio/app-connections/:id/push",
       "provider_symbol": "ctrl.updateAppConnectionPushController",
@@ -1293,6 +1573,30 @@
       "provider_file": "packages/server/src/modules/studio/routes/app-relay.ts",
       "consumer_file": "packages/client/src/api/studio/app-relay.ts",
       "consumer_line": 39
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/status",
+      "provider_symbol": "ctrl.authStatus",
+      "provider_file": "packages/server/src/modules/studio/routes/auth.ts",
+      "consumer_file": "packages/client/src/api/studio/auth.ts",
+      "consumer_line": 10
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "provider_symbol": "ctrl.login",
+      "provider_file": "packages/server/src/modules/studio/routes/auth.ts",
+      "consumer_file": "packages/client/src/components/hermes/pets/WebPet.vue",
+      "consumer_line": 183
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "provider_symbol": "ctrl.login",
+      "provider_file": "packages/server/src/modules/studio/routes/auth.ts",
+      "consumer_file": "packages/client/src/api/studio/auth.ts",
+      "consumer_line": 22
     },
     {
       "method": "POST",
@@ -1397,6 +1701,14 @@
       "provider_file": "packages/server/src/modules/studio/routes/auth.ts",
       "consumer_file": "packages/client/src/api/studio/auth.ts",
       "consumer_line": 186
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/auth/locked-ips",
+      "provider_symbol": "ctrl.unlockIpHandler",
+      "provider_file": "packages/server/src/modules/studio/routes/auth.ts",
+      "consumer_file": "packages/client/src/api/studio/auth.ts",
+      "consumer_line": 191
     },
     {
       "method": "DELETE",
@@ -1573,6 +1885,30 @@
       "provider_file": "packages/server/src/modules/studio/routes/devices.ts",
       "consumer_file": "packages/client/src/api/studio/devices.ts",
       "consumer_line": 113
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/files/list",
+      "provider_symbol": "ctrl.list",
+      "provider_file": "packages/server/src/modules/studio/routes/files.ts",
+      "consumer_file": "packages/client/src/api/studio/files.ts",
+      "consumer_line": 31
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/files/stat",
+      "provider_symbol": "ctrl.stat",
+      "provider_file": "packages/server/src/modules/studio/routes/files.ts",
+      "consumer_file": "packages/client/src/api/studio/files.ts",
+      "consumer_line": 37
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/files/read",
+      "provider_symbol": "ctrl.read",
+      "provider_file": "packages/server/src/modules/studio/routes/files.ts",
+      "consumer_file": "packages/client/src/api/studio/files.ts",
+      "consumer_line": 43
     },
     {
       "method": "PUT",
@@ -1767,6 +2103,22 @@
       "consumer_line": 416
     },
     {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms/:roomId/workspace-file/diff",
+      "provider_symbol": "workspaceCtrl.diffWorkspaceFile",
+      "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
+      "consumer_file": "packages/client/src/api/studio/group-chat.ts",
+      "consumer_line": 598
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms/:roomId/workspace-file/read",
+      "provider_symbol": "workspaceCtrl.readWorkspaceFile",
+      "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
+      "consumer_file": "packages/client/src/api/studio/group-chat.ts",
+      "consumer_line": 590
+    },
+    {
       "method": "PUT",
       "path": "/api/studio/group-chat/rooms/:roomId/workspace-file/write",
       "provider_symbol": "workspaceCtrl.writeWorkspaceFile",
@@ -1805,6 +2157,30 @@
       "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
       "consumer_file": "packages/client/src/api/studio/group-chat.ts",
       "consumer_line": 658
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms",
+      "provider_symbol": "ctrl.listRooms",
+      "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
+      "consumer_file": "packages/client/src/api/studio/group-chat.ts",
+      "consumer_line": 434
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms",
+      "provider_symbol": "ctrl.listRooms",
+      "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
+      "consumer_file": "packages/client/src/api/studio/group-chat.ts",
+      "consumer_line": 447
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms",
+      "provider_symbol": "ctrl.listRooms",
+      "provider_file": "packages/server/src/modules/studio/routes/group-chat.ts",
+      "consumer_file": "packages/client/src/api/studio/group-chat.ts",
+      "consumer_line": 585
     },
     {
       "method": "PUT",
@@ -1923,6 +2299,14 @@
       "path": "/health",
       "provider_symbol": "ctrl.healthCheck",
       "provider_file": "packages/server/src/modules/studio/routes/health.ts",
+      "consumer_file": "packages/client/src/components/layout/RuntimeRestartPrompt.vue",
+      "consumer_line": 114
+    },
+    {
+      "method": "GET",
+      "path": "/health",
+      "provider_symbol": "ctrl.healthCheck",
+      "provider_file": "packages/server/src/modules/studio/routes/health.ts",
       "consumer_file": "packages/client/src/api/studio/system.ts",
       "consumer_line": 67
     },
@@ -1951,12 +2335,36 @@
       "consumer_line": 61
     },
     {
+      "method": "POST",
+      "path": "/api/studio/jev/test",
+      "provider_symbol": "ctrl.testConnection",
+      "provider_file": "packages/server/src/modules/studio/routes/jev.ts",
+      "consumer_file": "packages/client/src/api/studio/jev.ts",
+      "consumer_line": 64
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/jev/evaluate",
+      "provider_symbol": "ctrl.evaluate",
+      "provider_file": "packages/server/src/modules/studio/routes/jev.ts",
+      "consumer_file": "packages/client/src/api/studio/jev.ts",
+      "consumer_line": 67
+    },
+    {
       "method": "GET",
       "path": "/api/studio/logs",
       "provider_symbol": "ctrl.list",
       "provider_file": "packages/server/src/modules/studio/routes/logs.ts",
       "consumer_file": "packages/client/src/api/studio/logs.ts",
       "consumer_line": 18
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/logs",
+      "provider_symbol": "ctrl.list",
+      "provider_file": "packages/server/src/modules/studio/routes/logs.ts",
+      "consumer_file": "packages/client/src/api/studio/logs.ts",
+      "consumer_line": 42
     },
     {
       "method": "GET",
@@ -2013,6 +2421,14 @@
       "provider_file": "packages/server/src/modules/studio/routes/performance-monitor.ts",
       "consumer_file": "packages/client/src/api/studio/performance-monitor.ts",
       "consumer_line": 62
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/petdex/manifest",
+      "provider_symbol": "ctrl.manifest",
+      "provider_file": "packages/server/src/modules/studio/routes/petdex.ts",
+      "consumer_file": "packages/client/src/api/studio/petdex.ts",
+      "consumer_line": 21
     },
     {
       "method": "GET",
@@ -2088,6 +2504,142 @@
     },
     {
       "method": "GET",
+      "path": "/api/studio/sessions/conversations/:id/messages/paginated",
+      "provider_symbol": "ctrl.getConversationMessagesPaginated",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 441
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions",
+      "provider_symbol": "ctrl.list",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 177
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions",
+      "provider_symbol": "ctrl.list",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 311
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions",
+      "provider_symbol": "ctrl.list",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 412
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions",
+      "provider_symbol": "ctrl.list",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 424
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions",
+      "provider_symbol": "ctrl.list",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 470
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/hermes",
+      "provider_symbol": "ctrl.listHermesSessions",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 365
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/hermes",
+      "provider_symbol": "ctrl.listHermesSessions",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 393
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/hermes",
+      "provider_symbol": "ctrl.listHermesSessions",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 458
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/hermes",
+      "provider_symbol": "ctrl.listHermesSessions",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 481
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/hermes/groups",
+      "provider_symbol": "ctrl.listHermesSessionGroups",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 377
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/search/sessions",
+      "provider_symbol": "ctrl.search",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 403
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/usage",
+      "provider_symbol": "ctrl.usageBatch",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 685
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/usage/stats",
+      "provider_symbol": "ctrl.usageStats",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 678
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/usage/pricing",
+      "provider_symbol": "ctrl.usagePricing",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/components/hermes/usage/UsagePricing.vue",
+      "consumer_line": 64
+    },
+    {
+      "method": "PUT",
+      "path": "/api/studio/usage/pricing",
+      "provider_symbol": "ctrl.updateUsagePricing",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/components/hermes/usage/UsagePricing.vue",
+      "consumer_line": 84
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/context-length",
+      "provider_symbol": "ctrl.contextLength",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 702
+    },
+    {
+      "method": "GET",
       "path": "/api/studio/sessions/:id/workspace-run-changes",
       "provider_symbol": "ctrl.listWorkspaceRunChanges",
       "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
@@ -2101,6 +2653,22 @@
       "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
       "consumer_file": "packages/client/src/api/studio/sessions.ts",
       "consumer_line": 228
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/:id/workspace-file/diff",
+      "provider_symbol": "ctrl.diffWorkspaceFile",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 252
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/:id/workspace-file/read",
+      "provider_symbol": "ctrl.readWorkspaceFile",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 242
     },
     {
       "method": "PUT",
@@ -2149,6 +2717,14 @@
       "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
       "consumer_file": "packages/client/src/api/studio/sessions.ts",
       "consumer_line": 690
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/sessions/batch-delete",
+      "provider_symbol": "ctrl.batchRemove",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/api/studio/sessions.ts",
+      "consumer_line": 499
     },
     {
       "method": "POST",
@@ -2224,6 +2800,38 @@
     },
     {
       "method": "GET",
+      "path": "/api/studio/workspace/folders",
+      "provider_symbol": "ctrl.listWorkspaceFolders",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/components/hermes/chat/FolderPicker.vue",
+      "consumer_line": 76
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/workspace/folders",
+      "provider_symbol": "ctrl.createWorkspaceFolder",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/components/hermes/chat/FolderPicker.vue",
+      "consumer_line": 255
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/workspace/folders/rename",
+      "provider_symbol": "ctrl.renameWorkspaceFolder",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/components/hermes/chat/FolderPicker.vue",
+      "consumer_line": 267
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/studio/workspace/folders",
+      "provider_symbol": "ctrl.deleteWorkspaceFolder",
+      "provider_file": "packages/server/src/modules/studio/routes/sessions.ts",
+      "consumer_file": "packages/client/src/components/hermes/chat/FolderPicker.vue",
+      "consumer_line": 226
+    },
+    {
+      "method": "GET",
       "path": "/api/social-messages/platforms",
       "provider_symbol": "ctrl.listPlatforms",
       "provider_file": "packages/server/src/modules/studio/routes/social-messages.ts",
@@ -2287,6 +2895,14 @@
       "consumer_line": 128
     },
     {
+      "method": "GET",
+      "path": "/api/social-messages/weixin/qrcode/status",
+      "provider_symbol": "ctrl.pollWeixinQrcodeStatus",
+      "provider_file": "packages/server/src/modules/studio/routes/social-messages.ts",
+      "consumer_file": "packages/client/src/api/studio/social-messages.ts",
+      "consumer_line": 132
+    },
+    {
       "method": "POST",
       "path": "/api/social-messages/weixin/credentials",
       "provider_symbol": "ctrl.saveWeixinCredentials",
@@ -2301,6 +2917,22 @@
       "provider_file": "packages/server/src/modules/studio/routes/social-messages.ts",
       "consumer_file": "packages/client/src/api/studio/social-messages.ts",
       "consumer_line": 177
+    },
+    {
+      "method": "GET",
+      "path": "/api/social-messages/feishu/qrcode",
+      "provider_symbol": "ctrl.getFeishuQrcode",
+      "provider_file": "packages/server/src/modules/studio/routes/social-messages.ts",
+      "consumer_file": "packages/client/src/api/studio/social-messages.ts",
+      "consumer_line": 136
+    },
+    {
+      "method": "GET",
+      "path": "/api/social-messages/feishu/qrcode/status",
+      "provider_symbol": "ctrl.pollFeishuQrcodeStatus",
+      "provider_file": "packages/server/src/modules/studio/routes/social-messages.ts",
+      "consumer_file": "packages/client/src/api/studio/social-messages.ts",
+      "consumer_line": 142
     },
     {
       "method": "GET",
@@ -2357,6 +2989,14 @@
       "provider_file": "packages/server/src/modules/studio/routes/stt.ts",
       "consumer_file": "packages/client/src/api/studio/stt-settings.ts",
       "consumer_line": 142
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/studio/stt/settings/:provider/base-url-preset",
+      "provider_symbol": "ctrl.deleteBaseUrlPreset",
+      "provider_file": "packages/server/src/modules/studio/routes/stt.ts",
+      "consumer_file": "packages/client/src/api/studio/stt-settings.ts",
+      "consumer_line": 152
     },
     {
       "method": "DELETE",
@@ -2472,6 +3112,14 @@
     },
     {
       "method": "DELETE",
+      "path": "/api/studio/tts/settings/:provider/base-url-preset",
+      "provider_symbol": "ctrl.deleteBaseUrlPreset",
+      "provider_file": "packages/server/src/modules/studio/routes/tts.ts",
+      "consumer_file": "packages/client/src/api/studio/tts-settings.ts",
+      "consumer_line": 142
+    },
+    {
+      "method": "DELETE",
       "path": "/api/studio/tts/settings/:provider/secret/:secretName",
       "provider_symbol": "ctrl.deleteSecret",
       "provider_file": "packages/server/src/modules/studio/routes/tts.ts",
@@ -2541,6 +3189,14 @@
       "provider_file": "packages/server/src/modules/studio/routes/update.ts",
       "consumer_file": "packages/client/src/api/studio/system.ts",
       "consumer_line": 101
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/uploads",
+      "provider_symbol": "ctrl.handleUpload",
+      "provider_file": "packages/server/src/modules/studio/routes/upload.ts",
+      "consumer_file": "packages/client/src/stores/hermes/chat.ts",
+      "consumer_line": 621
     },
     {
       "method": "POST",
@@ -2621,6 +3277,14 @@
       "provider_file": "packages/server/src/modules/studio/routes/workflows.ts",
       "consumer_file": "packages/client/src/api/studio/workflows.ts",
       "consumer_line": 347
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/workflows/:id/runs",
+      "provider_symbol": "ctrl.listRuns",
+      "provider_file": "packages/server/src/modules/studio/routes/workflows.ts",
+      "consumer_file": "packages/client/src/api/studio/workflows.ts",
+      "consumer_line": 241
     },
     {
       "method": "GET",

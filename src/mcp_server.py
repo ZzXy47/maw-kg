@@ -170,11 +170,13 @@ class CGMcpSession:
             )
             self.q = queue.Queue()
             threading.Thread(target=self._reader, daemon=True).start()
-            self._send({"jsonrpc": "2.0", "id": 1, "method": "initialize",
+            self.iid = 1
+            self._send({"jsonrpc": "2.0", "id": self.iid, "method": "initialize",
                         "params": {"protocolVersion": "2024-11-05", "capabilities": {},
                                    "clientInfo": {"name": "maw-kg", "version": "1.0"}}})
             self._recv(30)
             self._send({"jsonrpc": "2.0", "method": "notifications/initialized"})
+            self.iid = 1  # tools/call ids start at 2, never colliding with init
 
     def _reader(self):
         for line in self.proc.stdout:

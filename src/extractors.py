@@ -149,22 +149,134 @@ TS_REQUEST_RE = re.compile(
     re.S)
 
 
+def _clean_ts_path(raw: str) -> str:
+    """Normalize a TS client path literal to a comparable route path.
+    Ternary/nested-backtick chunks = query conditional → strip; bare query-ish
+    identifiers (${suffix}/${qs}/${params}) = query → strip; ?${x} = query tail
+    → strip; every other ${x} (calls, member exprs) = path param → {param};
+    glued ?literal → cut."""
+    p = raw
+    if re.search(r"\$\{[^}]*\?", p) or "`" in p:
+        p = re.sub(r"\$\{.*$", "", p)
+    else:
+        def repl(m):
+            expr = m.group(1).strip()
+            if re.fullmatch(r"[a-z_]\w*", expr) and expr.lower() in (
+                    "suffix", "qs", "query", "params", "querystring", "q", "search"):
+                return ""
+            return "{param}"
+        p = re.sub(r"\$\{([^}]*)\}", repl, p)
+    return p.split("?")[0]
+
+
 def ts_request_template(src: str, file: str) -> list:
     """request<T>(`/api/x/${id}`, { method: 'PATCH', ... }) — client API wrapper.
     Path params may be template literals; method defaults to GET."""
     out = []
-    pat = (r"request(?:<[^>]*>)?\(\s*[\"'`]([^\"'`]+)[\"'`]"
+    pat = (r"request(?:<[^>]*(?:<[^>]*>)?[^>]*>)?\(\s*[\"'`]([^\"'`]+)[\"'`]"
            r"(?:\s*,\s*\{(?:(?!\}\)).)*?method:\s*[\"'](\w+)[\"'])?")
     for m in re.finditer(pat, src, re.S):
         raw_path, verb = m.group(1), m.group(2) or "GET"  # omitted method = GET
-        # ${x} after a '/' = path param; ${x} glued to the last segment
-        # (no '/' before) = query/suffix — strip it.
-        path = re.sub(r"(?<!/)\$\{[^}]*\}", "", raw_path)   # glued suffix
-        path = re.sub(r"/\$\{[^}]*\}", "/{param}", path)     # real path params
-        path = re.sub(r"\$\{[^}]*\}", "{param}", path)       # any leftovers
+        path = _clean_ts_path(raw_path)
         line = src[: m.start()].count("\n") + 1
         out.append(Endpoint(verb.upper(), "/" + path.lstrip("/"), "request-wrapper",
                             file, line, "consumer", "TS-REQUEST-TEMPLATE"))
+    # appendQuery('path', params) / withQuery(...) helpers — GET semantics
+    for m in re.finditer(
+        r"(?:appendQuery|withQuery|buildQuery)\(\s*[\"'`]([^\"'`]+)[\"'`]", src):
+        raw_path = m.group(1)
+        if not raw_path.startswith("/"):  # only absolute API paths
+            continue
+        # statement-scan: search for method: within the rest of this statement
+        # (paren-walk alone stops at appendQuery's own closing paren)
+        i, depth = m.end(), 1
+        while i < len(src) and depth > 0:
+            if src[i] == '(':
+                depth += 1
+            elif src[i] == ')':
+                depth -= 1
+            i += 1
+        window = src[m.end():i + 400]
+        vm = re.search(r"method:\s*[\"'](\w+)[\"']", window.split("\n\n")[0])
+        v = (vm.group(1) if vm else "GET").upper()
+        path = _clean_ts_path(raw_path)
+        line = src[: m.start()].count("\n") + 1
+        out.append(Endpoint(v, "/" + path.lstrip("/"), "query-helper",
+                            file, line, "consumer", "TS-REQUEST-TEMPLATE"))
+    # path-builder indirection: const p = (id) => `/api/x/${id}` then
+    # request(p(...), { method: 'DELETE' }) or request(p(...) + '/suffix', ...)
+    # Resolve the builder literal into a consumer call, with method lookahead.
+    builders = {}
+    for m in re.finditer(
+        r"(?:const|let|function)\s+(\w+Path)\s*(?:=\s*(?:\([^)]*\)|\w+)\s*=>|=?\s*function\s*\([^)]*\)\s*|\([^)]*\)\s*=>)\s*[\"'`]([^\"'`]+)[\"'`]",
+        src):
+        builders[m.group(1)] = m.group(2)
+    for m in re.finditer(
+        r"request(?:<[^>]*(?:<[^>]*>)?[^>]*>)?\(\s*(\w+Path)\s*\(", src):
+        name = m.group(1)
+        if name not in builders:
+            continue
+        # paren-depth walk: m.end() sits just inside presetPath's '('.
+        i, depth = m.end(), 1
+        while i < len(src) and depth > 0:
+            if src[i] == '(':
+                depth += 1
+            elif src[i] == ')':
+                depth -= 1
+            i += 1
+        inner_close = i  # just past presetPath(...)
+        # continue to the matching ')' of the enclosing request(...) call
+        depth = 1
+        j = inner_close
+        while j < len(src) and depth > 0:
+            if src[j] == '(':
+                depth += 1
+            elif src[j] == ')':
+                depth -= 1
+            j += 1
+        outer_close = j
+        window = src[m.end():outer_close]           # args region of request()
+        cm = re.search(r"\)\s*\+\s*[\"']([^\"']+)[\"']", window)
+        vm = re.search(r"method:\s*[\"'](\w+)[\"']", window)
+        raw_path = builders[name] + (cm.group(1) if cm else "")
+        v = (vm.group(1) if vm else "GET").upper()
+        path = _clean_ts_path(raw_path)
+        line = src[: m.start()].count("\n") + 1
+        out.append(Endpoint(v, "/" + path.lstrip("/"), "path-builder",
+                            file, line, "consumer", "TS-REQUEST-TEMPLATE"))
+    # fetch() calls (file uploads/downloads bypassing request()): fetch(url)
+    # and fetch(`${baseUrl}/api/...`, { method: 'POST' })
+    for m in re.finditer(
+        r"(?:await\s+|return\s+|=)?fetch\(\s*(?:[\"'`]([^\"'`]+)[\"'`]|\$\{[^}]+\}([\"'`][^\"'`]+)[\"'`])",
+        src):
+        raw_path = m.group(1) or m.group(2) or ""
+        if not raw_path.startswith("/"):
+            continue
+        tail = src[m.end(): m.end() + 300]
+        vm = re.search(r"method:\s*[\"'](\w+)[\"']", tail.split(")")[0] if ")" in tail else tail)
+        path = re.sub(r"\$\{[^}]*\}", "{param}", raw_path)
+        path = re.sub(r"(?<!/)\$\{[^}]*\}", "", path).split("?")[0]
+        v = (vm.group(1) if vm else "GET").upper()
+        line = src[: m.start()].count("\n") + 1
+        out.append(Endpoint(v, "/" + path.lstrip("/"), "fetch-call",
+                            file, line, "consumer", "TS-REQUEST-TEMPLATE"))
+    # const ENDPOINT = '/api/x' constant + fetch(ENDPOINT) / request(ENDPOINT)
+    consts = {}
+    for m in re.finditer(
+        r"const\s+(\w+ENDPOINT\w*|\w+API_PATH\w*)\s*=\s*[\"']([^\"']+)[\"']", src):
+        consts[m.group(1)] = m.group(2)
+    for m in re.finditer(
+        r"(?:fetch|request)(?:<[^>]*>)?\(\s*(\w+ENDPOINT\w*|\w+API_PATH\w*)\b", src):
+        if m.group(1) in consts:
+            raw_path = consts[m.group(1)]
+            if not raw_path.startswith("/"):
+                continue
+            tail = src[m.end(): m.end() + 300]
+            vm = re.search(r"method:\s*[\"'](\w+)[\"']", tail.split(")")[0] if ")" in tail else tail)
+            v = (vm.group(1) if vm else "GET").upper()
+            line = src[: m.start()].count("\n") + 1
+            out.append(Endpoint(v, raw_path, "endpoint-const",
+                                file, line, "consumer", "TS-REQUEST-TEMPLATE"))
     return out
 
 

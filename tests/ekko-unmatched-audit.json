@@ -1,0 +1,676 @@
+{
+  "unmatched": 133,
+  "classification": {
+    "server": 54,
+    "client-string": 35,
+    "tests": 36,
+    "bin": 8
+  },
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/api/coding-agents/:id/config-files/:key",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/coding-agents/:id/mcp/servers",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/coding-agents/:id/mcp/servers",
+      "bucket": "server"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/coding-agents/:id/mcp/servers/:name",
+      "bucket": "server"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/coding-agents/:id/mcp/servers/:name",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/coding-agents/:id/mcp/servers/:name/test",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/ekko/skills/import",
+      "bucket": "client-string"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/kanban/artifact",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/kanban/search-sessions",
+      "bucket": "client-string"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/data-migrations/windows-appdata",
+      "bucket": "client-string"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/data-migrations/windows-appdata",
+      "bucket": "client-string"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/auth/minimax/status",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/model-context/:provider/:model",
+      "bucket": "client-string"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hermes/model-context",
+      "bucket": "client-string"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/plugins/:key/enable",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/plugins/:key/disable",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/app/profiles",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/profiles/:name/export",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/profiles/import",
+      "bucket": "client-string"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hermes/config/providers/:poolKey",
+      "bucket": "client-string"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/bundles",
+      "bucket": "client-string"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/bundles",
+      "bucket": "client-string"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hermes/bundles/:commandName",
+      "bucket": "client-string"
+    },
+    {
+      "method": "POST",
+      "path": "/api/hermes/skills/import",
+      "bucket": "client-string"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/hermes/skills/:category/:skill",
+      "bucket": "client-string"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/hermes/skills/:category/:skill",
+      "bucket": "client-string"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/skills/:category/:skill/files",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/hermes/skills/{*path}",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/openapi.json",
+      "bucket": "bin"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/studio/push/registration",
+      "bucket": "server"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/studio/push/registration",
+      "bucket": "server"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/studio/live-activities/registration",
+      "bucket": "server"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/studio/live-activities/registration",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/app-uploads",
+      "bucket": "tests"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/studio/app-uploads/:id/chunks",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/app-uploads/:id/complete",
+      "bucket": "server"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/studio/app-uploads/:id",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/app-login",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/mcu-login",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/chat-run/runs",
+      "bucket": "bin"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/mobile-calendar/request",
+      "bucket": "bin"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/mobile-location/request",
+      "bucket": "bin"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/mobile-health/request",
+      "bucket": "bin"
+    },
+    {
+      "method": "POST",
+      "path": "/webhook-test/:token",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/devices/link-request",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/devices/link-status",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/devices/link-info",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/devices/peer-connections/:connectionId/terminal",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/devices/peer-connections/:connectionId/terminals",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/devices/peer-connections/:connectionId/terminal/:terminalId/read",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/devices/peer-connections/:connectionId/terminal/:terminalId/input",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/devices/peer-connections/:connectionId/terminal/:terminalId/resize",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/devices/peer-connections/:connectionId/terminal/:terminalId/close",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/devices/peer-connections/:connectionId/exec",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/devices/peer-connections/:connectionId/download",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/devices/peer-connections/:connectionId/upload",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/files/download",
+      "bucket": "client-string"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/files/preview",
+      "bucket": "client-string"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/files/upload",
+      "bucket": "client-string"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/group-chat/invites/:code/attachments",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/invites/:code/attachments/:file",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat-link/v1/capabilities",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/group-chat/invites/:code/agent-links/:requestId/submit",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/group-chat/invites/:code/agent-links/:requestId/failure",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/invites/:code/agent-links/:requestId",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/group-chat/remote-workspace/v1",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/remote-workspace/v1/file",
+      "bucket": "tests"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/studio/group-chat/remote-workspace/v1/file",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms/:roomId/agent-link-requests",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/group-chat/rooms/:roomId/agent-link-requests/:requestId/decision",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/group-chat/rooms/:roomId/attachments",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/group-chat/rooms/:roomId/attachment-uploads",
+      "bucket": "server"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/studio/group-chat/rooms/:roomId/attachment-uploads/:id/chunks",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/group-chat/rooms/:roomId/attachment-uploads/:id/complete",
+      "bucket": "server"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/studio/group-chat/rooms/:roomId/attachment-uploads/:id",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms/:roomId/attachments/:file",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms/:roomId",
+      "bucket": "client-string"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms/:roomId/workspace-files/list",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/group-chat/rooms/:roomId/workspace-file/content",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/livez",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/jev/browser/match",
+      "bucket": "bin"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/jev/browser/verify",
+      "bucket": "bin"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/logs/:name",
+      "bucket": "client-string"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/mcu/firmware/:version/manifest",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/mcu/firmware/:version/firmware.bin",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/mcu/firmware/manifest",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/mcu/firmware.bin",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/media/grok-image-to-video",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/media/apikey-image-generate",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/media/minimax-image-to-video",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/petdex/asset",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/session-shares/claim",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/session-shares/access",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/session-shares/check",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/sessions/:sessionId/shares",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/:sessionId/shares",
+      "bucket": "server"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/studio/sessions/:sessionId/shares/:shareId",
+      "bucket": "server"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/studio/sessions/:sessionId/shares/:shareId",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/count",
+      "bucket": "bin"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/hermes/:id",
+      "bucket": "client-string"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/sessions/hermes/:id/import",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/search",
+      "bucket": "client-string"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/usage/pricing",
+      "bucket": "client-string"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/studio/usage/pricing",
+      "bucket": "client-string"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/:id/context",
+      "bucket": "client-string"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/:id/workspace-files/list",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/:id/workspace-file/content",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/:id",
+      "bucket": "client-string"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/:id/export",
+      "bucket": "tests"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/studio/sessions/:id",
+      "bucket": "client-string"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/sessions/:id/share-voice/synthesize",
+      "bucket": "server"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/sessions/:id/share-voice/transcribe",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/:id/share-models",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/:id/share-context-length",
+      "bucket": "server"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/studio/sessions/:id/share-context-length",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/sessions/:id/share-workspaces",
+      "bucket": "server"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/workspace/folders",
+      "bucket": "client-string"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/workspace/folders",
+      "bucket": "client-string"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/workspace/folders/rename",
+      "bucket": "client-string"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/studio/workspace/folders",
+      "bucket": "client-string"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/voice/proxy/:profile/v1/audio/transcriptions",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/stt/profile-status",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/stt/profile-status/missing-audio",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/mcu/voice-turn",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/theme/background",
+      "bucket": "client-string"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/tts",
+      "bucket": "client-string"
+    },
+    {
+      "method": "POST",
+      "path": "/api/tts/proxy/audio/speech",
+      "bucket": "tests"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/mcu/audio/:file",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/voice/proxy/:profile/v1/tts",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/voice/proxy/:profile/v1/audio/speech",
+      "bucket": "tests"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/tts/synthesize",
+      "bucket": "client-string"
+    },
+    {
+      "method": "POST",
+      "path": "/api/studio/uploads",
+      "bucket": "client-string"
+    },
+    {
+      "method": "GET",
+      "path": "/api/studio/workflows",
+      "bucket": "client-string"
+    }
+  ]
+}
