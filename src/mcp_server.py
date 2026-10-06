@@ -577,6 +577,15 @@ DESC = {
 
 # ---------------------------------------------------------------- MCP stdio server
 def serve():
+    # Windows integration: when spawned by an MCP host (Hermes/other) without a
+    # UTF-8 console, stdout defaults to cp936/GBK and Chinese text in tool
+    # descriptions corrupts the JSON-RPC stream (0xa1 bytes). Force UTF-8.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stdin.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
     def make_schema(props):
         return {"type": "object",
                 "properties": {k: {"type": "string" if v == "str" else "integer"}
