@@ -121,14 +121,64 @@ def sw_array_path(src: str, file: str) -> list:
     return out
 
 
+# ---------------------------------------------------------------- TS-KOA-ROUTE
+def ts_koa_route(src: str, file: str) -> list:
+    """const r = new Router(); r.get('/api/x/:id', mw, ctrl.h) — Koa Router
+    chained route registration (ekko-studio server modules pattern)."""
+    out = []
+    for m in re.finditer(
+        r"(\w+)\.(get|post|put|patch|delete)\(\s*[\"']([^\"']+)[\"']\s*,"
+        r"(?:(?!/api/).){0,400}?(\w+)\.(\w+)\)",
+        src, re.S):
+        router_var, verb, path, ctrl_ns, handler = m.groups()
+        # only Koa router files: require the new Router() + path starts with /api/ or /
+        if "new Router()" not in src:
+            continue
+        line = src[: m.start()].count("\n") + 1
+        out.append(Endpoint(m.group(2).upper(), m.group(3),
+                            f"{ctrl_ns}.{handler}", file, line, "provider",
+                            "TS-KOA-ROUTE"))
+    return out
+
+
+# ---------------------------------------------------------------- TS-REQUEST-TEMPLATE
+TS_REQUEST_RE = re.compile(
+    r"(?:await\s+)?request(?:<[^>]*>)?\(\s*"
+    r"([\"'`])([^\"'`]*\{[^\"'`}]*)?\1?\s*,?\s*"
+    r"(?:\{[^}]*(?:method:\s*[\"'](\w+)[\"'])[^}]*\})?",
+    re.S)
+
+
+def ts_request_template(src: str, file: str) -> list:
+    """request<T>(`/api/x/${id}`, { method: 'PATCH', ... }) — client API wrapper.
+    Path params may be template literals; method defaults to GET."""
+    out = []
+    pat = (r"request(?:<[^>]*>)?\(\s*[\"'`]([^\"'`]+)[\"'`]"
+           r"(?:\s*,\s*\{(?:(?!\}\)).)*?method:\s*[\"'](\w+)[\"'])?")
+    for m in re.finditer(pat, src, re.S):
+        raw_path, verb = m.group(1), m.group(2) or "GET"  # omitted method = GET
+        # ${x} after a '/' = path param; ${x} glued to the last segment
+        # (no '/' before) = query/suffix — strip it.
+        path = re.sub(r"(?<!/)\$\{[^}]*\}", "", raw_path)   # glued suffix
+        path = re.sub(r"/\$\{[^}]*\}", "/{param}", path)     # real path params
+        path = re.sub(r"\$\{[^}]*\}", "{param}", path)       # any leftovers
+        line = src[: m.start()].count("\n") + 1
+        out.append(Endpoint(verb.upper(), "/" + path.lstrip("/"), "request-wrapper",
+                            file, line, "consumer", "TS-REQUEST-TEMPLATE"))
+    return out
+
+
 # ---------------------------------------------------------------- PATH-NORM
 def path_norm(a: str, b: str) -> bool:
-    """Equivalence under /api prefix delta + webhook placeholder unification."""
+    """Equivalence under /api prefix delta + placeholder unification.
+    Koa :name, TS ${expr} and REST {name} params all collapse to {param}."""
     def norm(s):
         s = s.strip()
         if not s.startswith("/"):
             s = "/" + s
         s = re.sub(r"\{webhook_?id\}", "{id}", s, flags=re.I)
+        s = re.sub(r":(\w+)(?=/|$)", "{param}", s)      # koa :id → {param}
+        s = re.sub(r"\{param\}|\{\w+\}", "{param}", s)  # unify all named params
         s = re.sub(r"/api(?=/)", "", s)  # strip leading /api when followed by /
         return s.strip("/").lower()
     return norm(a) == norm(b)
