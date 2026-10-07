@@ -56,3 +56,4 @@ python tests/p0_green_bridge.py
 Known open: 19 client-string route pairs unextractable by regex (tree-sitter is the P5 path); ekko Android shell repo not in this repo (APK build unverified).
 - O-round 2026-10-06 (d462cd1): prewarm (first explore 22.8s→4.9s), maw_detect_changes (O-2, diff→symbols+contract fan-out, quiesce-sync-lock-retry), maw_cognition_search (O-3, FRAS keyword/tag), orphan-daemon reap (O-5); tool count 8→10; o_fix 8/8 + bakeoff 12/12 + all suites green
 - Remaining: O-4 tree-sitter (P5); 19 client-string pairs
+- Fix round 2026-10-07 (uncommitted): ① REPO_ROOTS externalized to `repos.yaml`（加仓=改 yaml+重启 MCP，不再改源码）；② maw_status 加索引体积体检（db < 1MB 报 `suspect-empty`，防 init 被管道截断产生空壳索引）；③ maw_query/maw_node/maw_impact 的 `repo` 参数改为必填（require_repo 明确报错，不再静默回退 ha-android）。7 仓已迁入 repos.yaml（5 HA + ekko-studio + hermes-agent）。

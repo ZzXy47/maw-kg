@@ -39,18 +39,44 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 CONTRACTS_YAML = ROOT / "contracts" / "contracts.yaml"
-REPO_ROOTS = {
+REPOS_YAML = ROOT / "repos.yaml"
+
+_DEFAULT_REPOS = {
     "ha-core": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/home-assistant-core",
     "ha-android": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/home-assistant-android",
     "ha-ios": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/home-assistant-ios",
     "homogram-arkts": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/homogram-arkts",
     "aaos-codelabs": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/aaos-car-codelabs",
+    "ekko-studio": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/ekko-studio",
+    "hermes-agent": r"C:/Users/pc/AppData/Local/hermes/hermes-agent",
 }
+
+
+def load_repos() -> dict:
+    """#3: REPO_ROOTS is externalized to repos.yaml. Adding a repo = edit the
+    yaml + restart the MCP process, no source edit. Missing/corrupt yaml falls
+    back to _DEFAULT_REPOS (silent — stderr is not protocol-safe in all hosts)."""
+    if REPOS_YAML.exists():
+        try:
+            import yaml  # noqa: F401  (PyYAML is ensured at the contract layer import)
+            data = yaml.safe_load(REPOS_YAML.read_text(encoding="utf-8")) or {}
+            repos = data.get("repos") if isinstance(data, dict) else {}
+            if isinstance(repos, dict) and repos:
+                return {str(k): str(v) for k, v in repos.items()}
+        except Exception:
+            pass
+    return dict(_DEFAULT_REPOS)
+
+
+REPO_ROOTS = load_repos()
 NODE_EXE = r"C:/Program Files/nodejs/node.exe"
 CG_SHIM = r"E:/CrossDevice_Agent_GitNexus_Pilot/tool-codegraph/node_modules/@colbymchenry/codegraph/npm-shim.js"
 MAXCHARS_DEFAULT = 8192
 RETRY_MAX = 3
 RETRY_BACKOFF_S = 0.8
+# #2 index health: a codegraph.db smaller than this is almost certainly a
+# truncated/empty-shell index (observed 172KB shell vs ≥4MB real indexes).
+MIN_INDEX_BYTES = 1 * 1024 * 1024
 
 # ---------------------------------------------------------------- env self-check (v3.1 §5.1)
 def cluster_size_bytes(vol: str) -> int:
@@ -361,6 +387,19 @@ def budget(text: str, maxchars: int) -> str:
         return text
     return text[:maxchars] + f"\n…[maw-kg] truncated at {maxchars} chars (pass maxChars to widen)"
 
+
+def require_repo(a) -> str:
+    """#4: repo is REQUIRED for query/node/impact — refuse with a clear error
+    instead of silently falling back to ha-android (which produced wrong-repo
+    results when the caller forgot the repo argument)."""
+    repo = a.get("repo")
+    registered = ", ".join(sorted(REPO_ROOTS))
+    if not repo:
+        raise ValueError("repo is required (registered: " + registered + ")")
+    if repo not in REPO_ROOTS:
+        raise ValueError(f"unknown repo '{repo}' (registered: " + registered + ")")
+    return repo
+
 def t_explore(a):
     repo = a.get("repo") or a.get("projectPath") or "ha-android"
     path = REPO_ROOTS.get(repo, repo)
@@ -392,7 +431,7 @@ def t_explore(a):
     return budget(text, int(a.get("maxChars", MAXCHARS_DEFAULT)))
 
 def t_query(a):
-    repo = a.get("repo", "ha-android")
+    repo = require_repo(a)
     # Principle #3 filter: CG query is fuzzy (name-segment vocab) — post-filter to
     # exact name or exact-prefix matches so worktree/branch isolation is preserved.
     out = cg_cli(["query", a["query"], "--limit", str(a.get("limit", 10))], Path(REPO_ROOTS[repo]))
@@ -433,7 +472,7 @@ def t_query(a):
     return budget(filtered + note, int(a.get("maxChars", MAXCHARS_DEFAULT)))
 
 def t_node(a):
-    repo = a.get("repo", "ha-android")
+    repo = require_repo(a)
     args = ["node", a["name"]]
     if a.get("file"):
         args += ["--file", a["file"]]
@@ -441,7 +480,7 @@ def t_node(a):
     return budget(out, int(a.get("maxChars", MAXCHARS_DEFAULT)))
 
 def t_impact(a):
-    repo = a.get("repo", "ha-android")
+    repo = require_repo(a)
     out = cg_cli(["impact", a["symbol"]], Path(REPO_ROOTS[repo]))
     return budget(out, int(a.get("maxChars", MAXCHARS_DEFAULT)))
 
@@ -542,6 +581,7 @@ def t_status(a):
     for r in REPO_ROOTS:
         p = db_path(r)
         if p.exists():
+            size = p.stat().st_size
             con = db_con(r)
             try:
                 v = dict(con.execute("SELECT key,value FROM project_metadata").fetchall())
@@ -553,6 +593,10 @@ def t_status(a):
                 }
             finally:
                 con.close()
+            if size < MIN_INDEX_BYTES:
+                out["indexes"][r]["health"] = (
+                    f"suspect-empty: db={size} bytes < {MIN_INDEX_BYTES} — "
+                    "rebuild with `codegraph init -v` (not `index`)")
         else:
             out["indexes"][r] = {"missing": True}
     out["daemon"] = {"alive": bool(CG.proc and CG.proc.poll() is None)}
@@ -561,9 +605,9 @@ def t_status(a):
 TOOLS = {
     "maw_explore": (t_explore, {"query": "str", "repo": "str?", "maxFiles": "int?",
                                 "maxChars": "int?"}),
-    "maw_query": (t_query, {"query": "str", "repo": "str?", "limit": "int?", "maxChars": "int?"}),
-    "maw_node": (t_node, {"name": "str", "repo": "str?", "file": "str?", "maxChars": "int?"}),
-    "maw_impact": (t_impact, {"symbol": "str", "repo": "str?", "maxChars": "int?"}),
+    "maw_query": (t_query, {"query": "str", "repo": "str", "limit": "int?", "maxChars": "int?"}),
+    "maw_node": (t_node, {"name": "str", "repo": "str", "file": "str?", "maxChars": "int?"}),
+    "maw_impact": (t_impact, {"symbol": "str", "repo": "str", "maxChars": "int?"}),
     "maw_contracts": (t_contracts, {}),
     "maw_cognition_search": (t_cognition_search, {"keyword": "str?", "tag": "str?"}),
     "maw_detect_changes": (t_detect_changes, {"repo": "str", "ref": "str?"}),
@@ -605,7 +649,7 @@ def serve():
         return {"type": "object",
                 "properties": {k: {"type": t(v)} for k, v in props.items()},
                 "required": [k for k, v in props.items()
-                             if v == "str" and k in ("query", "name", "symbol")]}
+                             if v == "str"]}
 
     def line_out(obj):
         sys.stdout.write(json.dumps(obj, ensure_ascii=False) + "\n")
