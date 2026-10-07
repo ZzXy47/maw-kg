@@ -70,7 +70,7 @@ out5,_=call("maw_explore",{"query":"websocket authentication","repo":"ha-ios","m
 chk("3 maxChars budget caps ~20K explore", out5 is not None and len(out5)<=8300, f"{len(out5 or '')}ch")
 
 # 4 — stale lock auto-clean (G0-①②)
-core_lock = Path(r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/home-assistant-core/.codegraph/writer.pid")
+core_lock = _trepo("ha-core") / ".codegraph" / "writer.pid"
 bak = None
 if core_lock.exists():
     bak = core_lock.read_bytes(); core_lock.unlink()

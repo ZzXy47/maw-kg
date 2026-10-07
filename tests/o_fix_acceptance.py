@@ -4,6 +4,19 @@ import json, subprocess, sys, threading, time
 import queue as Q
 from pathlib import Path
 
+import os as _os
+
+def _trepo(name: str):
+    """Test fixture repo path: MAW_KG_TEST_REPOS env (root dir containing
+    home-assistant-core/ etc.) > local default. Kept out of the published
+    default so the repo stays machine-agnostic; CI sets the env var."""
+    root = _os.environ.get("MAW_KG_TEST_REPOS", "")
+    if root:
+        return Path(root) / name
+    from kg_config import REPO_ROOTS as _R
+    return Path(_R[name])
+
+
 MAW = Path(r'D:/maw-kg')
 results = []
 def chk(name, ok, detail=""):
@@ -72,7 +85,7 @@ d = json.loads(r['result']['content'][0]['text'])
 chk('7 O-2 clean tree → 0 symbols 0 hits', d['changed_files']==0 and d['changed_symbols']==[], d)
 
 # 8 — O-2 with a probe edit: symbol + contract hit through the MCP wire
-repo = Path(r'E:/CrossDevice_Agent_GitNexus_Pilot/repos/home-assistant-android')
+repo = _trepo('ha-android')
 f = repo/'common/src/main/kotlin/io/homeassistant/companion/android/common/data/integration/impl/IntegrationRepositoryImpl.kt'
 orig = f.read_text(encoding='utf-8')
 try:

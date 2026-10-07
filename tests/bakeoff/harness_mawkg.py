@@ -5,11 +5,12 @@ import json, re, subprocess, sys, time
 from pathlib import Path
 
 sys.path.insert(0, 'D:/maw-kg/src')
-sys.path.insert(0, 'E:/CrossDevice_Agent_GitNexus_Pilot/_audit/bakeoff-2026-10-06')
+sys.path.insert(0, _os.environ.get('MAW_KG_TEST_BAKEOFF_DIR', './tests/bakeoff'))
 
 MAW = 'D:/maw-kg'
 EKKO = 'D:/maw-kg/work/ekko-studio'
-PILOT = 'E:/CrossDevice_Agent_GitNexus_Pilot'
+import os as _os
+PILOT = _os.environ.get('MAW_KG_TEST_PILOT', '.')
 
 results = {}
 
@@ -85,7 +86,7 @@ try:
         time.sleep(1.5)
     except Exception:
         pass
-    r = subprocess.run(['node', 'E:/CrossDevice_Agent_GitNexus_Pilot/tool-codegraph/node_modules/@colbymchenry/codegraph/npm-shim.js', 'sync'],
+    r = subprocess.run(['node', _os.environ.get('MAW_KG_CG_SHIM', 'codegraph'), 'sync'],
                        capture_output=True, text=True, cwd=repo, timeout=300,
                        env={**__import__('os').environ, 'PATH': 'C:/Program Files/nodejs;' + __import__('os').environ.get('PATH', ''), 'CODEGRAPH_TELEMETRY': '0'})
     # exact-match query via MAW filter discipline
@@ -147,7 +148,7 @@ finally:
     elif lock.exists():
         lock.unlink()
 
-Path('E:/CrossDevice_Agent_GitNexus_Pilot/_audit/bakeoff-2026-10-06/mawkg-results.json').write_text(
+Path(_os.environ.get('MAW_KG_TEST_BAKEOFF_DIR', './tests/bakeoff')) / 'mawkg-results.json'.write_text(
     json.dumps(results, ensure_ascii=False, indent=2), encoding='utf-8')
 n_pass = sum(1 for v in results.values() if v['verdict'] == 'PASS')
 print(f"\nMAW-KG: {n_pass}/12 PASS")

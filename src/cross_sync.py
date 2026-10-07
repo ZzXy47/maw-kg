@@ -22,9 +22,10 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 import contract_check as CC  # noqa: E402
 from mcp_server import REPO_ROOTS, db_path, RepoGovernor  # noqa: E402
+from kg_config import GIT_EXE as _GIT_FALLBACK  # noqa: E402
 
 import shutil as _shutil
-GIT_EXE = _shutil.which("git") or r"C:/Program Files/Git/cmd/git.exe"
+GIT_EXE = _shutil.which("git") or _GIT_FALLBACK
 
 
 MAX_SUBGRAPH_DEPTH = 4

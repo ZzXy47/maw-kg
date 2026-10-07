@@ -17,11 +17,12 @@ import json
 import re
 import sqlite3
 import subprocess
-import shutil as _shutil
-GIT_EXE = _shutil.which("git") or r"C:/Program Files/Git/cmd/git.exe"
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from kg_config import REPO_ROOTS as _YAML_REPOS, GIT_EXE  # noqa: E402
 
 try:
     import yaml  # PyYAML
@@ -29,13 +30,15 @@ except ImportError:
     yaml = None
 
 # --- config ---
-REPO_ROOTS = {
-    "ha-core": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/home-assistant-core",
-    "ha-android": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/home-assistant-android",
-    "ha-ios": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/home-assistant-ios",
-    "homogram-arkts": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/homogram-arkts",
-    "aaos-codelabs": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/aaos-car-codelabs",
-}
+# Single source (kg_config): repos.yaml > env. No hardcoded user paths.
+# Callers may override via set_repos() (mcp_server injects its live registry).
+REPO_ROOTS: dict = dict(_YAML_REPOS)
+
+
+def set_repos(roots: dict) -> None:
+    """Inject a repo registry (used by mcp_server so both layers share one)."""
+    REPO_ROOTS.clear()
+    REPO_ROOTS.update(roots)
 
 # path prefixes that differ between consumers/providers (PATH-NORM, v3.1 §7)
 PATH_NORM_PREFIXES = ["/api"]

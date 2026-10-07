@@ -3,7 +3,8 @@
 import json, os, re, sqlite3, subprocess, sys, time
 from pathlib import Path
 
-PILOT = 'E:/CrossDevice_Agent_GitNexus_Pilot'
+import os as _os
+PILOT = _os.environ.get('MAW_KG_TEST_PILOT', '.')
 NODE = 'C:/Program Files/nodejs/node.exe'
 GN = PILOT + '/tool/node_modules/gitnexus/dist/cli/index.js'
 ENV = {**os.environ,
@@ -31,7 +32,7 @@ ekko_registered = 'ekko-studio' in registered or any('ekko' in k for k in regist
 # Q1/Q2/Q3 need ekko indexed in GitNexus — if not registered, that's a finding (index cost), register on E: copy? GitNexus needs repo path; use D: copy.
 if not ekko_registered:
     t0 = time.time()
-    r = gn('analyze', 'E:/CrossDevice_Agent_GitNexus_Pilot/repos/ekko-studio', '--index-only', '--skip-fts', '--workers', '2', timeout=900)
+    r = gn('analyze', _os.environ.get('MAW_KG_TEST_REPOS', 'repos') + '/ekko-studio', '--index-only', '--skip-fts', '--workers', '2', timeout=900)
     dt = time.time() - t0
     rec('INDEX-EKKO', 'DONE' if r.returncode == 0 else 'FAIL', f"index ekko-studio rc={r.returncode} in {dt:.0f}s")
     ekko_registered = r.returncode == 0

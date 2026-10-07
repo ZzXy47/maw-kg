@@ -39,38 +39,17 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
 CONTRACTS_YAML = ROOT / "contracts" / "contracts.yaml"
-REPOS_YAML = ROOT / "repos.yaml"
 
-_DEFAULT_REPOS = {
-    "ha-core": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/home-assistant-core",
-    "ha-android": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/home-assistant-android",
-    "ha-ios": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/home-assistant-ios",
-    "homogram-arkts": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/homogram-arkts",
-    "aaos-codelabs": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/aaos-car-codelabs",
-    "ekko-studio": r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/ekko-studio",
-    "hermes-agent": r"C:/Users/pc/AppData/Local/hermes/hermes-agent",
-}
-
-
-def load_repos() -> dict:
-    """#3: REPO_ROOTS is externalized to repos.yaml. Adding a repo = edit the
-    yaml + restart the MCP process, no source edit. Missing/corrupt yaml falls
-    back to _DEFAULT_REPOS (silent — stderr is not protocol-safe in all hosts)."""
-    if REPOS_YAML.exists():
-        try:
-            import yaml  # noqa: F401  (PyYAML is ensured at the contract layer import)
-            data = yaml.safe_load(REPOS_YAML.read_text(encoding="utf-8")) or {}
-            repos = data.get("repos") if isinstance(data, dict) else {}
-            if isinstance(repos, dict) and repos:
-                return {str(k): str(v) for k, v in repos.items()}
-        except Exception:
-            pass
-    return dict(_DEFAULT_REPOS)
-
+# Single source of truth for machine-specific resolution (kg_config):
+# env vars MAW_KG_* > repos.yaml > shutil.which / standard locations.
+# No user-absolute paths are hardcoded in the published tree.
+from kg_config import (  # noqa: E402
+    REPOS_YAML, load_repos, resolve_node_exe, resolve_cg_shim, node_path_prefix,
+)
 
 REPO_ROOTS = load_repos()
-NODE_EXE = r"C:/Program Files/nodejs/node.exe"
-CG_SHIM = r"E:/CrossDevice_Agent_GitNexus_Pilot/tool-codegraph/node_modules/@colbymchenry/codegraph/npm-shim.js"
+NODE_EXE = resolve_node_exe()
+CG_SHIM = resolve_cg_shim()
 MAXCHARS_DEFAULT = 8192
 RETRY_MAX = 3
 RETRY_BACKOFF_S = 0.8
@@ -178,9 +157,10 @@ class CGQueryError(Exception):
 def _node_env() -> dict:
     """Env for node children: compose over os.environ (MCP-host baseline
     survives) but GUARANTEE the vars node native modules need on Windows —
-    missing SystemRoot crashes them with rc 134."""
+    missing SystemRoot crashes them with rc 134. PATH prefix comes from the
+    resolved node location (kg_config), never a hardcoded install dir."""
     e = {**os.environ, "CODEGRAPH_TELEMETRY": "0",
-         "PATH": "C:/Program Files/nodejs;" + os.environ.get("PATH", "")}
+         "PATH": node_path_prefix()}
     if os.name == "nt":
         e.setdefault("SYSTEMROOT", "C:\\Windows")
         e.setdefault("SYSTEMDRIVE", "C:")
@@ -189,6 +169,11 @@ def _node_env() -> dict:
 
 def cg_cli(args: list, cwd: Path, timeout: int = 180) -> str:
     """Run codegraph CLI with transient-failure retry (heavy-I/O concurrency)."""
+    if not CG_SHIM:
+        raise CGQueryError(
+            "CodeGraph CLI not found. Set MAW_KG_CG_SHIM to the npm shim "
+            "(node_modules/@colbymchenry/codegraph/npm-shim.js) or install "
+            "codegraph on PATH. See README 'Install'.")
     last = None
     for attempt in range(1, RETRY_MAX + 1):
         r = subprocess.run(
@@ -372,6 +357,9 @@ def db_con(repo: str):
 # ---------------------------------------------------------------- contract layer (P0)
 sys.path.insert(0, str(ROOT / "src"))
 import contract_check as CC  # noqa: E402
+# Single repo registry across layers: contract_check reads the same
+# repos.yaml-derived registry mcp_server uses (no duplicate definitions).
+CC.set_repos(REPO_ROOTS)
 # NOTE: contract_check requires PyYAML; ensure it's importable at server start.
 try:
     import yaml  # noqa: F401

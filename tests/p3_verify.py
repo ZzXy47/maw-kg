@@ -12,7 +12,8 @@ def chk(name, ok, detail=""):
     results.append({"name": name, "pass": bool(ok), "detail": str(detail)[:180]})
     print(("PASS" if ok else "FAIL"), name, "|", str(detail)[:140])
 
-P = Path(r"E:/CrossDevice_Agent_GitNexus_Pilot/repos")
+import os as _os
+P = Path(_os.environ.get("MAW_KG_TEST_REPOS", "repos"))
 
 # PY-CLASS-ROUTE
 src = read(P/"home-assistant-core/homeassistant/components/mobile_app/http_api.py")

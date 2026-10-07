@@ -5,7 +5,8 @@ from pathlib import Path
 
 MAW = 'D:/maw-kg'
 EKKO = 'D:/maw-kg/work/ekko-studio'
-PILOT = 'E:/CrossDevice_Agent_GitNexus_Pilot'
+import os as _os
+PILOT = _os.environ.get('MAW_KG_TEST_PILOT', '.')
 NODE = 'C:/Program Files/nodejs/node.exe'
 CG = PILOT + '/tool-codegraph/node_modules/@colbymchenry/codegraph/npm-shim.js'
 ENV = {**os.environ, 'CODEGRAPH_TELEMETRY': '0', 'PATH': 'C:/Program Files/nodejs;' + os.environ.get('PATH', '')}

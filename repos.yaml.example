@@ -1,0 +1,26 @@
+# MAW-KG repo registry — TEMPLATE
+#
+# Copy this file to repos.yaml (same directory) and fill in YOUR absolute
+# repo paths. repos.yaml is gitignored user data; it never ships.
+#
+#   cp repos.yaml.example repos.yaml   # then edit
+#
+# Keys are the `repo` argument used by MCP tools (maw_query/maw_node/...).
+# Adding a repo = add a line + restart the MCP process. No source edits.
+#
+# Index discipline (see README):
+#   - Writable indexes (daemon/wal/shm churn) must live on 4KB-cluster NTFS
+#     (C:/D: on Windows) — NOT on >64KB-cluster volumes (e.g. exFAT).
+#     Read-only single-file query indexes tolerate large clusters.
+#   - Build an index: run `codegraph init -v` inside the repo directory
+#     (use `init -v`, not `index` — piped/quiet output can truncate silently
+#     and leave an empty-shell index).
+
+repos:
+  my-backend: /absolute/path/to/your/backend-repo
+  my-android-app: /absolute/path/to/your/android-repo
+
+# Optional tool-path overrides (env vars MAW_KG_NODE_EXE / MAW_KG_CG_SHIM /
+# MAW_KG_GIT_EXE take precedence over these):
+# node_exe: C:/Program Files/nodejs/node.exe
+# cg_shim: /absolute/path/to/node_modules/@colbymchenry/codegraph/npm-shim.js

@@ -15,9 +15,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from mcp_server import REPO_ROOTS, db_path  # noqa: E402
+from kg_config import CG_SHIM as _CG_SHIM_CFG, GIT_EXE, node_path_prefix  # noqa: E402
 
 import shutil as _shutil
-GIT_EXE = _shutil.which("git") or r"C:/Program Files/Git/cmd/git.exe"
+GIT_EXE = _shutil.which("git") or GIT_EXE
 
 import contract_check as CC  # noqa: E402
 
@@ -35,10 +36,10 @@ def sync_repo(repo: str) -> bool:
         pass
     _t.sleep(1.5)  # OS-level file-lock release after tree-kill
     env = {**os.environ, "CODEGRAPH_TELEMETRY": "0",
-           "PATH": "C:/Program Files/nodejs;" + os.environ.get("PATH", "")}
+           "PATH": node_path_prefix()}
     for attempt in range(3):
         r = subprocess.run(
-            ["node", CG_SHIM, "sync"], capture_output=True, text=True,
+            ["node", _CG_SHIM_CFG or "codegraph", "sync"], capture_output=True, text=True,
             cwd=str(REPO_ROOTS[repo]), timeout=600, env=env)
         if r.returncode == 0:
             return True
@@ -46,9 +47,6 @@ def sync_repo(repo: str) -> bool:
             return False
         _t.sleep(2.0 * (attempt + 1))  # locked → wait and retry
     return False
-
-
-CG_SHIM = r"E:/CrossDevice_Agent_GitNexus_Pilot/tool-codegraph/node_modules/@colbymchenry/codegraph/npm-shim.js"
 
 
 def _hunks(repo: str, ref: str) -> dict:

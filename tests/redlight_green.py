@@ -8,7 +8,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 from extractors import (py_class_route, kt_url_builder, kt_retrofit_url,
                         sw_request_wrapper, sw_array_path, path_norm, read)
 
-P = Path(r"E:/CrossDevice_Agent_GitNexus_Pilot/repos")
+import os as _os
+P = Path(_os.environ.get("MAW_KG_TEST_REPOS", "repos"))
 results = []
 def chk(name, ok, detail=""):
     results.append({"name": name, "green": bool(ok), "detail": str(detail)[:160]})

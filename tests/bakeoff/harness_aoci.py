@@ -3,7 +3,8 @@
 import json, os, re, subprocess, sys, time
 from pathlib import Path
 
-PILOT = 'E:/CrossDevice_Agent_GitNexus_Pilot'
+import os as _os
+PILOT = _os.environ.get('MAW_KG_TEST_PILOT', '.')
 AOCI = PILOT + '/tool-aoci/aoci.exe'
 results = {}
 def rec(q, verdict, detail):

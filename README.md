@@ -1,59 +1,142 @@
 # MAW-KG
 
-Multi-Agent Workspace Knowledge Graph —— 面向多端全栈大项目的仓库理解插件。
+Multi-Agent Workspace Knowledge Graph —— a code-understanding MCP server for
+multi-repo, cross-platform projects. It bridges the CodeGraph indexer (symbol
+index + call graphs) with an explicit cross-repo contract layer, so an agent
+can ask "who calls this endpoint, across repos?" and get answers bound to
+real symbols — never synthesized.
 
-设计稿：`E:/CrossDevice_Agent_GitNexus_Pilot/_audit/MAW-KG-design-v3.md`（v3.1）
-全部实测底稿：`E:/CrossDevice_Agent_GitNexus_Pilot/_audit/`
+Built and validated against a real multi-platform codebase (Home Assistant
+core / Android / iOS + a HarmonyOS ArkTS client + AAOS car codelabs).
 
-## 目录
+## What it does
 
-```
-D:/maw-kg/
-  contracts/contracts.yaml   # 跨端契约清单（git 版本化，人审）
-  docs/contracts-schema.md   # 契约模式设计
-  src/contract_check.py      # 核对脚本（P0 交付）
-  tests/p0_green_bridge.py   # P0 绿灯验收（对照红灯脚本六断言）
-```
+- **10 MCP tools** (stdio JSON-RPC): `maw_explore` / `maw_query` / `maw_node` /
+  `maw_impact` / `maw_contracts` / `maw_cognition_search` /
+  `maw_detect_changes` / `maw_cross_impact` / `maw_contract_check` / `maw_status`
+- **Symbol search + blast radius** per repo (CodeGraph-backed, budget-capped)
+- **Cross-repo contracts**: YAML-declared provider/consumer bindings, exact-match
+  verified against each repo's index — a broken binding fails loudly
+- **Change fan-out**: `git diff` → changed symbols → affected contracts
+- **L4 cognition layer**: tagged FRAS entries over contracts (keyword/tag search)
 
-## P0 用法
+Core principles: explicit contracts; bind to real symbols; exact match only;
+path normalization up front; generated files excluded; no fabricated edges
+("宁可报错不给假边" — fail loudly, never invent an edge).
+
+## Install
+
+Requirements:
+
+- Python 3.10+ (developed on 3.14)
+- Node.js 18+ on PATH
+- git on PATH
+- The [CodeGraph](https://www.npmjs.com/package/@colbymchenry/codegraph) CLI:
+  ```bash
+  npm install -g @colbymchenry/codegraph   # or into a local node_modules
+  ```
+- PyYAML: `pip install pyyaml`
+
+Setup:
+
+1. Clone this repo.
+2. Register your repos:
+   ```bash
+   cp repos.yaml.example repos.yaml
+   # edit repos.yaml — absolute paths, one per line under repos:
+   ```
+3. Build an index for each registered repo (inside that repo's directory):
+   ```bash
+   cd /path/to/your/repo && codegraph init -v
+   ```
+   Use `init -v`, not `index`: piped/quiet output can truncate silently and
+   leave an empty-shell index (`maw_status` flags those as `suspect-empty`).
+4. Optional env overrides (win over repos.yaml / PATH):
+   - `MAW_KG_NODE_EXE` — absolute path to node
+   - `MAW_KG_CG_SHIM` — absolute path to the codegraph npm shim
+   - `MAW_KG_GIT_EXE` — absolute path to git
+
+Run the server:
 
 ```bash
-# 全量核对（任一绑定失败即退出非零——宁可报错不给假边）
-python src/contract_check.py
-
-# JSON 输出
-python src/contract_check.py --json
-
-# 变更影响：改了后端哪些契约受波及
-python src/contract_check.py --check-diff ha-core HEAD
-
-# P0 验收（四项全绿）
-python tests/p0_green_bridge.py
+python src/mcp_server.py serve
 ```
 
-## 依赖
+Register it with any MCP host (Claude Desktop, Hermes, etc.) as a stdio server.
 
-- Python 3.14+（已用 Hermes 自带解释器验证）
-- PyYAML（已装 6.0.3）
-- 夹具仓的 CodeGraph 索引（`E:/CrossDevice_Agent_GitNexus_Pilot/repos/*/.codegraph/`，已建）
+## Quick verification
 
-## 状态
+```bash
+python src/mcp_server.py env          # cluster-size self-check
+python src/contract_check.py          # verify all contract bindings
+```
 
-- **P0 完成（2026-10-06）**：3 条真实跨端契约（设备注册 / Watch 注册 / webhook 更新），14 项绑定核对全过；diff 影响报告正反例验证通过；绿灯桥四项全绿。
-- P1（CodeGraph 内核 + MCP 常驻 + 守护进程治理）待开工。
+## Layout
+
+```
+contracts/contracts.yaml   # cross-repo contract registry (versioned, human-reviewed)
+contracts/cognition.yaml   # L4 FRAS entries (tagged contract cognition)
+docs/contracts-schema.md   # contract schema design
+src/mcp_server.py          # MCP stdio server + daemon governance
+src/kg_config.py           # single-source config resolution (env > repos.yaml > PATH)
+src/contract_check.py      # P0 binding checker
+src/cross_sync.py          # P2 cross-repo sync + local subgraph impact
+src/extractors.py          # P3 route extraction (nine forms)
+src/detect_changes.py      # diff → symbols → contract fan-out
+src/cognition.py           # L4 FRAS layer
+repos.yaml.example         # repo registry template (copy to repos.yaml)
+tests/                     # verification suites + bakeoff harnesses
+```
+
+## Contract example
+
+```yaml
+contracts:
+  - id: mobile-app-register
+    kind: http
+    description: Mobile app registration endpoint
+    provider: {repo: ha-core, symbol: mobile_app.register, file: "...", line: 123,
+               path_variant: "/api/mobile_app/register"}
+    consumers:
+      - {repo: ha-android, symbol: registerDevice, file: "...", line: 45,
+         path_variant: "/api/mobile_app/register"}
+    checks: [symbol_exists, path_match]
+```
+
+P0 CLI usage (all scripts runnable standalone):
+
+```bash
+python src/contract_check.py                     # verify all bindings (non-zero on FAIL)
+python src/contract_check.py --json              # JSON output
+python src/contract_check.py --check-diff ha-core HEAD   # which contracts a diff touches
+```
 
 ## Status
 
-- P0 contract schema + checker: 3 contracts, 14 bindings, 14 pass / 0 fail (2026-10-06)
-- P1 MCP server: 8 tools, G0 governance, env selfcheck — 15/15 + git acceptance 4/4
-- P2 cross-repo sync + detect-changes local subgraph: 8/8 real bindings, 0.01s
-- P3 extractors: NINE forms (PY-CLASS-ROUTE / KT-URL-BUILDER / KT-RETROFIT-URL / SW-REQUEST-WRAPPER / SW-ARRAY-PATH / PATH-NORM / TS-KOA-ROUTE / TS-REQUEST-TEMPLATE / ARKTS-OHOS-HTTP) — 9/9 + redlight 6/6
-- P4 L4 cognition + drift: 5/5
+- P0 contract schema + checker — 14/14 bindings green
+- P1 MCP server — 10 tools, G0 governance (writer liveness probe, stale-lock
+  cleanup, session-end daemon recycling, transient-error retry), env selfcheck
+- P2 cross-repo sync + detect-changes local subgraph — 8/8 real bindings
+- P3 extractors — nine forms (PY-CLASS-ROUTE / KT-URL-BUILDER / KT-RETROFIT-URL /
+  SW-REQUEST-WRAPPER / SW-ARRAY-PATH / PATH-NORM / TS-KOA-ROUTE /
+  TS-REQUEST-TEMPLATE / ARKTS-OHOS-HTTP), 9/9 + redlight 6/6
+- P4 L4 cognition + drift — 5/5
 - ekko-studio fixture: 525 routes, 413 auto-matched (78.7%), zero dead routes
-- Fix round 2026-10-06 (403c1b1): daemon-leak tree-kill (verified CLEAN), maw_cross_impact diff mode, env selfcheck read-only tolerance, ArkTS form 9
-- Full regression: 6 suites green
+- Bakeoff vs GitNexus / CodeGraph / AOCI — 12/12 (report in `tests/bakeoff/`)
+- O-round: prewarm (first explore 22.8s→4.9s), detect-changes with
+  quiesce-sync-lock-retry, FRAS keyword search, orphan-daemon reap
+- Windows hardened: UTF-8 stdio reconfigure (GBK console corruption),
+  absolute GIT_EXE resolution (host-filtered PATH), SYSTEMROOT guarantee for
+  node children, index-size health check (empty-shell detection)
+- Release round 2026-10-07: MIT license; all user-absolute paths removed
+  (single-source `kg_config.py`: env `MAW_KG_*` > `repos.yaml` > PATH);
+  `repos.yaml` gitignored with `repos.yaml.example` template; REPO_ROOTS
+  single-sourced across contract layer; README rewritten for external users;
+  test JSON artifacts gitignored
 
-Known open: 19 client-string route pairs unextractable by regex (tree-sitter is the P5 path); ekko Android shell repo not in this repo (APK build unverified).
-- O-round 2026-10-06 (d462cd1): prewarm (first explore 22.8s→4.9s), maw_detect_changes (O-2, diff→symbols+contract fan-out, quiesce-sync-lock-retry), maw_cognition_search (O-3, FRAS keyword/tag), orphan-daemon reap (O-5); tool count 8→10; o_fix 8/8 + bakeoff 12/12 + all suites green
-- Remaining: O-4 tree-sitter (P5); 19 client-string pairs
-- Fix round 2026-10-07 (uncommitted): ① REPO_ROOTS externalized to `repos.yaml`（加仓=改 yaml+重启 MCP，不再改源码）；② maw_status 加索引体积体检（db < 1MB 报 `suspect-empty`，防 init 被管道截断产生空壳索引）；③ maw_query/maw_node/maw_impact 的 `repo` 参数改为必填（require_repo 明确报错，不再静默回退 ha-android）。7 仓已迁入 repos.yaml（5 HA + ekko-studio + hermes-agent）。
+Known open: 19 client-string route pairs unextractable by regex (tree-sitter
+is the planned P5 path).
+
+## License
+
+MIT — see [LICENSE](LICENSE).

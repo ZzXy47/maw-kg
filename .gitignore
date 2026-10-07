@@ -1,3 +1,8 @@
 work/
 __pycache__/
 *.pyc
+repos.yaml
+tests/*.json
+asar-extract/
+asar-*.js
+asar-files.json

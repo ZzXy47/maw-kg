@@ -52,7 +52,20 @@ results.append({
 
 # 6: cross-impact via --check-diff (simulate diff by running against a synthetic ref)
 import sqlite3, tempfile, os
-core = Path(r"E:/CrossDevice_Agent_GitNexus_Pilot/repos/home-assistant-core")
+
+import os as _os
+
+def _trepo(name: str):
+    """Test fixture repo path: MAW_KG_TEST_REPOS env (root dir containing
+    home-assistant-core/ etc.) > local default. Kept out of the published
+    default so the repo stays machine-agnostic; CI sets the env var."""
+    root = _os.environ.get("MAW_KG_TEST_REPOS", "")
+    if root:
+        return Path(root) / name
+    from kg_config import REPO_ROOTS as _R
+    return Path(_R[name])
+
+core = _trepo("ha-core")
 target = core / "homeassistant/components/mobile_app/http_api.py"
 orig = target.read_text(encoding="utf-8")
 target.write_text(orig + "\n# p0-bridge-probe", encoding="utf-8")

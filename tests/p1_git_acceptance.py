@@ -8,7 +8,8 @@ import subprocess, sys, os, json
 from pathlib import Path
 
 NODE=r'C:/Program Files/nodejs/node.exe'
-CG=r'E:/CrossDevice_Agent_GitNexus_Pilot/tool-codegraph/node_modules/@colbymchenry/codegraph/npm-shim.js'
+import os as _os
+CG = _os.environ.get('MAW_KG_CG_SHIM') or r'codegraph'
 env={**os.environ,'CODEGRAPH_TELEMETRY':'0','PATH':'C:/Program Files/nodejs;'+os.environ.get('PATH','')}
 MAW=Path(r'D:/maw-kg')
 sys.path.insert(0,str(MAW/'src'))
