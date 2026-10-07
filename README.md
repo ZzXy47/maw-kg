@@ -66,6 +66,19 @@ python src/mcp_server.py serve            # stdio MCP server
 ```
 
 Then point any MCP host at it. Full details in [Install](#install).
+
+### Reporting problems
+
+Errors are captured **locally** in `work/errors.jsonl` (values never logged —
+only argument shapes; nothing leaves your machine). When something misbehaves:
+
+```bash
+python src/report.py          # writes work/report.md — review every line first
+python src/report.py --issue  # files a GitHub issue with the report (or prints a prefilled URL)
+```
+
+No telemetry, no silent uploads, no auto-email.
+
 ---
 
 ## 简体中文
@@ -113,6 +126,19 @@ python src/mcp_server.py serve            # stdio MCP 服务器
 ```
 
 任何 MCP 宿主接上即用。完整步骤见 [Install](#install)。
+
+### 问题反馈
+
+错误只会在**本地** `work/errors.jsonl` 里捕获（只记参数形态，不记值；
+不会有任何数据离开你的机器）。出问题时：
+
+```bash
+python src/report.py          # 生成 work/report.md —— 请先逐行过目
+python src/report.py --issue  # 附着报告提 GitHub issue（未登录 gh 时打印预填 URL）
+```
+
+没有遥测、没有静默上传、没有自动发邮件。
+
 ---
 
 ## 日本語
@@ -156,6 +182,19 @@ python src/mcp_server.py serve            # stdio MCPサーバー
 ```
 
 MCP対応ホストなら何にでも接続できる。詳細は [Install](#install)。
+
+### 問題の報告
+
+エラーは**ローカルの** `work/errors.jsonl` にのみ記録される（値ではなく引数の
+形のみ。あなたのマシンからデータが出ることはない）。問題が起きたら：
+
+```bash
+python src/report.py          # work/report.md を生成 — まず全行を確認
+python src/report.py --issue  # レポートを添えてGitHub issueを作成（gh未認証ならURLを出力）
+```
+
+テレメトリなし、サイレント・アップロードなし、自動メールなし。
+
 ---
 
 ## 한국어
@@ -199,6 +238,19 @@ python src/mcp_server.py serve            # stdio MCP 서버
 ```
 
 MCP 호스트라면 무엇에든 연결됩니다. 자세한 내용은 [Install](#install)을 보세요.
+
+### 문제 보고
+
+오류는 **로컬** `work/errors.jsonl`에만 기록됩니다(값이 아니라 인자 형태만.
+사용자의 머신에서 데이터가 나가는 일은 없습니다). 문제가 생기면:
+
+```bash
+python src/report.py          # work/report.md 생성 — 먼저 모든 줄을 검토하세요
+python src/report.py --issue  # 보고서를 첨부해 GitHub issue 생성(gh 미인증 시 URL 출력)
+```
+
+텔레메트리 없음, 자동 업로드 없음, 자동 이메일 없음.
+
 ---
 
 ## Install

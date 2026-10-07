@@ -690,8 +690,24 @@ def serve():
                 resp = {"jsonrpc": "2.0", "id": rid, "result": {
                     "content": [{"type": "text", "text": text}], "isError": False}}
             except Exception as e:
+                # Local capture only (privacy contract: nothing leaves the
+                # machine here — see src/error_log.py). Users submit reports
+                # explicitly via `python src/report.py --issue/--send`.
+                try:
+                    import error_log
+                    error_log.record_error(name, e, args)
+                except Exception:
+                    pass
+                hint = ""
+                try:
+                    import error_log
+                    if error_log.read_entries(1):
+                        hint = ("\n\n[maw-kg] captured locally. If this looks like a bug, run "
+                                "`python src/report.py --issue` to submit a diagnostic report.")
+                except Exception:
+                    pass
                 resp = {"jsonrpc": "2.0", "id": rid, "result": {
-                    "content": [{"type": "text", "text": f"ERROR: {e}"}], "isError": True}}
+                    "content": [{"type": "text", "text": f"ERROR: {e}{hint}"}], "isError": True}}
         else:
             resp = {"jsonrpc": "2.0", "id": rid,
                     "error": {"code": -32601, "message": f"method not found: {method}"}}
